@@ -60,8 +60,13 @@ func (polygon *Polygon) scan(s string) error {
 
 // Value converts a point to Well Known Text.
 func (polygon *Polygon) Value() (driver.Value, error) {
+	return polygon.String(), nil
+}
+
+// String converts the polygon to a string.
+func (polygon *Polygon) String() string {
 	if len(*polygon) == 0 {
-		return "POLYGON EMPTY", nil
+		return "POLYGON EMPTY"
 	}
 	s := "POLYGON("
 	s += strconv.FormatFloat((*polygon)[0][0], 'f', -1, 64)
@@ -70,5 +75,5 @@ func (polygon *Polygon) Value() (driver.Value, error) {
 		s += ", " + strconv.FormatFloat(coord[0], 'f', -1, 64)
 		s += " " + strconv.FormatFloat(coord[1], 'f', -1, 64)
 	}
-	return s + ")", nil
+	return s + ")"
 }

@@ -42,8 +42,13 @@ func (point *Point) Scan(src interface{}) error {
 
 // Value converts a point to Well Known Text.
 func (point *Point) Value() (driver.Value, error) {
+	return point.String(), nil
+}
+
+// String convert the point to a string.
+func (point *Point) String() string {
 	s := "POINT("
 	s += strconv.FormatFloat(point[0], 'f', -1, 64)
 	s += " " + strconv.FormatFloat(point[1], 'f', -1, 64) + ")"
-	return s, nil
+	return s
 }
