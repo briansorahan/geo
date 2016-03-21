@@ -71,7 +71,7 @@ func ExamplePoint() {
 	// The location column is of type GEOMETRY(POINT).
 	const InsertLocation = `
 INSERT INTO locations (location)
-VALUE                 (ST_GeomFromText($1))
+VALUES                (ST_GeomFromText($1))
 `
 	db, err := sql.Open("postgres", "datasource")
 	if err != nil {
