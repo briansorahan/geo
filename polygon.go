@@ -30,7 +30,7 @@ func (polygon *Polygon) Scan(src interface{}) error {
 	case string:
 		return polygon.scan(v)
 	default:
-		return ErrScan
+		return fmt.Errorf("could not scan polygon from %T", src)
 	}
 }
 

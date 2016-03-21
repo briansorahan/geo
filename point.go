@@ -35,7 +35,7 @@ func (point *Point) Scan(src interface{}) error {
 			return err
 		}
 	default:
-		return ErrScan
+		return fmt.Errorf("could not scan point from %T", src)
 	}
 	return nil
 }

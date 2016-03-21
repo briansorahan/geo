@@ -51,8 +51,8 @@ func TestPolygonScan(t *testing.T) {
 		t.Fatal("expected err, got nil")
 	}
 	// scan with bad type
-	if err := p.Scan(7); err != ErrScan {
-		t.Fatalf("expected ErrScan, got %T", err)
+	if err := p.Scan(7); err == nil {
+		t.Fatal("expected error, got nil")
 	}
 	// scan with bad strings
 	if err := p.Scan(bad2); err == nil {
