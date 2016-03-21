@@ -1,6 +1,10 @@
 package geo
 
-import "testing"
+import (
+	"database/sql"
+	"log"
+	"testing"
+)
 
 func TestPointMarshal(t *testing.T) {
 	p := &Point{1.2, 3.4}
@@ -59,5 +63,49 @@ func TestPointValue(t *testing.T) {
 	}
 	if expected != got {
 		t.Fatalf("expected %s, got %s", expected, got)
+	}
+}
+
+func ExamplePoint() {
+	// Insert a point into a table called "locations".
+	// The location column is of type GEOMETRY(POINT).
+	const InsertLocation = `
+INSERT INTO locations (location)
+VALUE                 (ST_GeomFromText($1))
+`
+	db, err := sql.Open("postgres", "datasource")
+	if err != nil {
+		log.Fatal(err)
+	}
+	result, err := db.Exec(InsertLocation, &Point{1.2, 3.4})
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if rowsAffected != 1 {
+		log.Fatalf("Expected rowsAffected to be 1, got %d", rowsAffected)
+	}
+
+	// Fetch the point we just created.
+	const GetHeartbeats = `
+SELECT ST_AsText(location) AS location
+FROM   locations
+`
+	rows, err := db.Query(GetHeartbeats)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for rows.Next() {
+		p := &Point{}
+		if err := rows.Scan(p); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("got location %s\n", p)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
 	}
 }
