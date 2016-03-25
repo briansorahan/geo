@@ -20,9 +20,9 @@ func TestPolygonMarshal(t *testing.T) {
 func TestPolygonScan(t *testing.T) {
 	var (
 		p    = &Polygon{}
-		good = "POLYGON(1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4)"
-		bad1 = "POLYGON(1.2, 3.4, 5.6, 7.8)"
-		bad2 = "POLYGON(1.2, 3.4, 5.6, 7.8"
+		good = "POLYGON((1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4)"
+		bad1 = "POLYGON((1.2, 3.4, 5.6, 7.8))"
+		bad2 = "POLYGON(1.2 3.4 5.6 7.8)"
 		bad3 = "PIKACHU"
 	)
 	// good scan
@@ -71,7 +71,7 @@ func TestPolygonValue(t *testing.T) {
 			{8.7, 6.5},
 			{4.3, 2.1},
 		}
-		expected = `POLYGON(1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1)`
+		expected = `POLYGON((1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1))`
 	)
 	value, err := p.Value()
 	if err != nil {

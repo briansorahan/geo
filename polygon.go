@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+const polygonPrefix = `POLYGON((`
+
 // Polygon is the GeoJSON Polygon geometry.
 type Polygon [][2]float64
 
@@ -36,14 +38,14 @@ func (polygon *Polygon) Scan(src interface{}) error {
 
 // scan scans a polygon from a Well Known Text string.
 func (polygon *Polygon) scan(s string) error {
-	if i := strings.Index(s, "POLYGON("); i != 0 {
+	if i := strings.Index(s, polygonPrefix); i != 0 {
 		return fmt.Errorf("malformed polygon %s", s)
 	}
 	l := len(s)
 	if s[l-1] != ')' {
 		return fmt.Errorf("malformed polygon %s", s)
 	}
-	s = s[8 : l-1]
+	s = s[len(polygonPrefix) : l-1]
 	// empty the polygon
 	*polygon = Polygon{}
 	// get the coordinates
@@ -68,12 +70,12 @@ func (polygon *Polygon) String() string {
 	if len(*polygon) == 0 {
 		return "POLYGON EMPTY"
 	}
-	s := "POLYGON("
+	s := polygonPrefix
 	s += strconv.FormatFloat((*polygon)[0][0], 'f', -1, 64)
 	s += " " + strconv.FormatFloat((*polygon)[0][1], 'f', -1, 64)
 	for _, coord := range (*polygon)[1:] {
 		s += ", " + strconv.FormatFloat(coord[0], 'f', -1, 64)
 		s += " " + strconv.FormatFloat(coord[1], 'f', -1, 64)
 	}
-	return s + ")"
+	return s + "))"
 }
