@@ -1,10 +1,9 @@
 package geo
 
 import (
-	"bytes"
 	"database/sql/driver"
-	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -14,13 +13,11 @@ const pointWKT = `POINT(%f %f)`
 type Point [2]float64
 
 // MarshalJSON returns the GeoJSON representation of the point.
-func (point *Point) MarshalJSON() ([]byte, error) {
-	s := []byte(`{"type":"Point","coordinates":`)
-	coords, err := json.Marshal([2]float64(*point))
-	if err != nil {
-		return nil, err
-	}
-	return bytes.Join([][]byte{s, coords, []byte("}")}, []byte{}), nil
+func (point Point) MarshalJSON() ([]byte, error) {
+	s := `{"type":"Point","coordinates":[`
+	s += strconv.FormatFloat(point[0], 'f', -1, 64) + ","
+	s += strconv.FormatFloat(point[1], 'f', -1, 64) + "]}"
+	return []byte(s), nil
 }
 
 // Scan scans a point from Well Known Text.
@@ -41,14 +38,39 @@ func (point *Point) Scan(src interface{}) error {
 }
 
 // Value converts a point to Well Known Text.
-func (point *Point) Value() (driver.Value, error) {
+func (point Point) Value() (driver.Value, error) {
 	return point.String(), nil
 }
 
 // String convert the point to a string.
-func (point *Point) String() string {
+func (point Point) String() string {
 	s := "POINT("
 	s += strconv.FormatFloat(point[0], 'f', -1, 64)
 	s += " " + strconv.FormatFloat(point[1], 'f', -1, 64) + ")"
 	return s
+}
+
+// RayhIntersects returns true if the horizontal ray going from
+// point to positive infinity intersects the line that connects a and b.
+func (point Point) RayhIntersects(a, b Point) bool {
+	var (
+		left   = math.Min(a[0], b[0])
+		right  = math.Max(a[0], b[0])
+		bottom = math.Min(a[1], b[1])
+		top    = math.Max(a[1], b[1])
+	)
+	if point[0] > right {
+		return false
+	}
+	if point[1] >= top || point[1] < bottom {
+		return false
+	}
+	if point[0] <= left {
+		return true
+	}
+	slope := (b[1] - a[1]) / (b[0] - a[0])
+	if slope >= 0 {
+		return ((point[1] - bottom) / (point[0] - left)) >= slope
+	}
+	return ((point[1] - top) / (point[0] - left)) <= slope
 }

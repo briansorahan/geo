@@ -7,44 +7,58 @@ import (
 )
 
 func TestPointMarshal(t *testing.T) {
-	p := &Point{1.2, 3.4}
-	expected := `{"type":"Point","coordinates":[1.2,3.4]}`
-	got, err := p.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(got) != expected {
-		t.Fatalf("expected %s, got %s", expected, string(got))
+	for _, testcase := range []struct {
+		P        Point
+		Expected string
+	}{
+		{
+			P:        Point{1.2, 3.4},
+			Expected: `{"type":"Point","coordinates":[1.2,3.4]}`,
+		},
+	} {
+		got, err := testcase.P.MarshalJSON()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(got) != testcase.Expected {
+			t.Fatalf("expected %s, got %s", testcase.Expected, string(got))
+		}
 	}
 }
 
 func TestPointScan(t *testing.T) {
-	var (
-		p    = &Point{}
-		good = "POINT(1.2 3.4)"
-		bad  = "POINT(1.2, 3.4)"
-	)
-	// good scan
-	if err := p.Scan(good); err != nil {
-		t.Fatal(err)
+	// Good
+	for _, testcase := range []struct {
+		WKT      interface{}
+		Expected Point
+	}{
+		{
+			WKT:      "POINT(1.2 3.4)",
+			Expected: Point{1.2, 3.4},
+		},
+	} {
+		p := &Point{}
+		if err := p.Scan(testcase.WKT); err != nil {
+			t.Fatal(err)
+		}
+		if expected, got := testcase.Expected[0], p[0]; expected != got {
+			t.Fatalf("expected %f, got %f", expected, got)
+		}
+		if expected, got := testcase.Expected[1], p[1]; expected != got {
+			t.Fatalf("expected %f, got %f", expected, got)
+		}
 	}
-	if expected, got := 1.2, p[0]; expected != got {
-		t.Fatalf("expected %f, got %f", expected, got)
-	}
-	if expected, got := 3.4, p[1]; expected != got {
-		t.Fatalf("expected %f, got %f", expected, got)
-	}
-	// bad scan
-	if err := p.Scan(bad); err == nil {
-		t.Fatalf("expected err, got nil")
-	}
-	// bad scan with bytes
-	if err := p.Scan([]byte(bad)); err == nil {
-		t.Fatal("expected err, got nil")
-	}
-	// scan with bad type
-	if err := p.Scan(7); err == nil {
-		t.Fatal("expected error, got nil")
+
+	// Bad
+	for _, testcase := range []interface{}{
+		"POINT(1.2, 3.4)",        // bad comma
+		[]byte("PIONT(1.4 2.3)"), // typo
+		7, // bad type
+	} {
+		p := &Point{}
+		if err := p.Scan(testcase); err == nil {
+			t.Fatal("expected error, got nil")
+		}
 	}
 }
 
