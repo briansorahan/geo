@@ -2,23 +2,151 @@ package geo
 
 import "testing"
 
+func TestPolygonCompare(t *testing.T) {
+	// Same
+	for _, testcase := range []struct {
+		P1 Polygon
+		P2 Polygon
+	}{
+		{
+			P1: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+			P2: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+		},
+	} {
+
+		if same := testcase.P1.Compare(testcase.P2); !same {
+			t.Fatal("expected %s and %s to be the same", testcase.P1.String(), testcase.P2.String())
+		}
+	}
+	// Different
+	for _, testcase := range []struct {
+		P1 Polygon
+		P2 Polygon
+	}{
+		{
+			P1: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+			P2: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+			},
+		},
+		{
+			P1: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+			P2: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.4, 7.3},
+			},
+		},
+		{
+			P1: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+			P2: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.5},
+			},
+		},
+	} {
+
+		if same := testcase.P1.Compare(testcase.P2); same {
+			t.Fatal("expected %s to not equal %s", testcase.P1.String(), testcase.P2.String())
+		}
+	}
+}
+
 func TestPolygonMarshal(t *testing.T) {
-	p := &Polygon{
-		{1.2, 3.4},
-		{5.6, 7.8},
+	// Pass
+	for _, testcase := range []struct {
+		Polygon  Polygon
+		Expected string
+	}{
+		{
+			Polygon: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+			},
+			Expected: `{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8]]}`,
+		},
+	} {
+		got, err := testcase.Polygon.MarshalJSON()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(got) != testcase.Expected {
+			t.Fatalf("expected %s, got %s", testcase.Expected, string(got))
+		}
 	}
-	expected := `{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8]]}`
-	got, err := p.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
+}
+
+func TestPolygonUnmarshal(t *testing.T) {
+	// Pass
+	for _, testcase := range []struct {
+		Input    string
+		Expected Polygon
+	}{
+		{
+			Input: `{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6]]}`,
+			Expected: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{5.8, 1.6},
+			},
+		},
+	} {
+		p := &Polygon{}
+		if err := p.UnmarshalJSON([]byte(testcase.Input)); err != nil {
+			t.Fatal(err)
+		}
+		if !p.Compare(testcase.Expected) {
+			t.Fatalf("expected %s to equal %s", p.String(), testcase.Expected.String())
+		}
 	}
-	if string(got) != expected {
-		t.Fatalf("expected %s, got %s", expected, string(got))
+	// Fail
+	for _, testcase := range []string{
+		`{"type":"Polygoon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6]]}`,
+		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6}}}`,
+		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8]]}`,
+		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8]]}`,
+		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[abc,-7.4]]}`,
+		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[-7.4,abc]]}`,
+	} {
+		p := &Polygon{}
+		if err := p.UnmarshalJSON([]byte(testcase)); err == nil {
+			t.Fatal("expected error, got nil")
+		}
 	}
 }
 
 func TestPolygonScan(t *testing.T) {
-	// Good
+	// Pass
 	for _, testcase := range []struct {
 		WKT      string
 		Expected Polygon
@@ -46,7 +174,7 @@ func TestPolygonScan(t *testing.T) {
 			}
 		}
 	}
-	// Bad
+	// Fail
 	for _, testcase := range []interface{}{
 		"POLYGON((1.2, 3.4, 5.6, 7.8))",
 		[]byte("POLYGON((1.2, 3.4, 5.6, 7.8))"),

@@ -1,10 +1,28 @@
 package geo
 
-import (
-	"database/sql"
-	"log"
-	"testing"
-)
+import "testing"
+
+func TestPointCompare(t *testing.T) {
+	// Different
+	for _, testcase := range []struct {
+		P1 Point
+		P2 Point
+	}{
+		{
+			P1: Point{1.2, 3.4},
+			P2: Point{1.2, 3.7},
+		},
+		{
+			P1: Point{1.2, 3.4},
+			P2: Point{9.2, 3.7},
+		},
+	} {
+
+		if same := testcase.P1.Compare(testcase.P2); same {
+			t.Fatalf("expected %s, got %s", testcase.P1.String(), testcase.P2.String())
+		}
+	}
+}
 
 func TestPointMarshal(t *testing.T) {
 	for _, testcase := range []struct {
@@ -22,6 +40,58 @@ func TestPointMarshal(t *testing.T) {
 		}
 		if string(got) != testcase.Expected {
 			t.Fatalf("expected %s, got %s", testcase.Expected, string(got))
+		}
+	}
+}
+
+func TestPointUnmarshal(t *testing.T) {
+	// Pass
+	for _, testcase := range []struct {
+		Input    string
+		Expected Point
+	}{
+		{
+			Input:    `{"type":"Point","coordinates":[1.2,3.4]}`,
+			Expected: Point{1.2, 3.4},
+		},
+	} {
+		p := &Point{}
+		if err := p.UnmarshalJSON([]byte(testcase.Input)); err != nil {
+			t.Fatal(err)
+		}
+		if !p.Compare(testcase.Expected) {
+			t.Fatalf("expected %s, got %s", testcase.Expected.String(), p.String())
+		}
+	}
+	// Fail
+	for _, testcase := range []struct {
+		Input    string
+		Expected Point
+	}{
+		{
+			Input:    `{"type":"Pont","coordinates":[1.2,3.4]}`,
+			Expected: Point{1.2, 3.4},
+		},
+		{
+			Input:    `{"type":"Point","coordinates":[1.2]}`,
+			Expected: Point{1.2, 3.4},
+		},
+		{
+			Input:    `{"type":"Point","coordinates":[1.2,3.4}}`,
+			Expected: Point{1.2, 3.4},
+		},
+		{
+			Input:    `{"type":"Point","coordinates":[abc,3.4]}`,
+			Expected: Point{1.2, 3.4},
+		},
+		{
+			Input:    `{"type":"Point","coordinates":[1.2,abc]}`,
+			Expected: Point{1.2, 3.4},
+		},
+	} {
+		p := &Point{}
+		if err := p.UnmarshalJSON([]byte(testcase.Input)); err == nil {
+			t.Fatal("expected error, but got nil")
 		}
 	}
 }
@@ -77,49 +147,5 @@ func TestPointValue(t *testing.T) {
 	}
 	if expected != got {
 		t.Fatalf("expected %s, got %s", expected, got)
-	}
-}
-
-func ExamplePoint() {
-	// Insert a point into a table called "locations".
-	// The location column is of type GEOMETRY(POINT).
-	const InsertLocation = `
-INSERT INTO locations (location)
-VALUES                (ST_GeomFromText($1))
-`
-	db, err := sql.Open("postgres", "datasource")
-	if err != nil {
-		log.Fatal(err)
-	}
-	result, err := db.Exec(InsertLocation, &Point{1.2, 3.4})
-	if err != nil {
-		log.Fatal(err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if rowsAffected != 1 {
-		log.Fatalf("Expected rowsAffected to be 1, got %d", rowsAffected)
-	}
-
-	// Fetch the point we just created.
-	const GetHeartbeats = `
-SELECT ST_AsText(location) AS location
-FROM   locations
-`
-	rows, err := db.Query(GetHeartbeats)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for rows.Next() {
-		p := &Point{}
-		if err := rows.Scan(p); err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("got location %s\n", p)
-	}
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
 	}
 }
