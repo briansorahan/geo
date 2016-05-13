@@ -25,7 +25,7 @@ func TestPolygonCompare(t *testing.T) {
 	} {
 
 		if same := testcase.P1.Compare(testcase.P2); !same {
-			t.Fatal("expected %s and %s to be the same", testcase.P1.String(), testcase.P2.String())
+			t.Fatalf("expected %s and %s to be the same", testcase.P1.String(), testcase.P2.String())
 		}
 	}
 	// Different
@@ -77,7 +77,7 @@ func TestPolygonCompare(t *testing.T) {
 	} {
 
 		if same := testcase.P1.Compare(testcase.P2); same {
-			t.Fatal("expected %s to not equal %s", testcase.P1.String(), testcase.P2.String())
+			t.Fatalf("expected %s to not equal %s", testcase.P1.String(), testcase.P2.String())
 		}
 	}
 }
