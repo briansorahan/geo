@@ -22,7 +22,7 @@ func TestFeatureCollectionMarshal(t *testing.T) {
 					},
 				},
 			},
-			Expected: `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[1,1],[1,-1],[-1,-1],[-1,1]]},"properties":null}]}`,
+			Expected: `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[1,1],[1,-1],[-1,-1],[-1,1]]]},"properties":null}]}`,
 		},
 	} {
 		got, err := testcase.Coll.MarshalJSON()
@@ -52,7 +52,7 @@ func TestFeatureCollectionMarshal(t *testing.T) {
 					},
 				},
 			},
-			Expected: `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[1,1],[1,-1],[-1,-1],[-1,1]]},"properties":null}]}`,
+			Expected: `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[1,1],[1,-1],[-1,-1],[-1,1]]]},"properties":null}]}`,
 		},
 	} {
 		if _, err := testcase.Coll.MarshalJSON(); err == nil {

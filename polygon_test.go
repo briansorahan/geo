@@ -93,7 +93,7 @@ func TestPolygonMarshal(t *testing.T) {
 				{1.2, 3.4},
 				{5.6, 7.8},
 			},
-			Expected: `{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8]]}`,
+			Expected: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8]]]}`,
 		},
 	} {
 		got, err := testcase.Polygon.MarshalJSON()
@@ -113,7 +113,7 @@ func TestPolygonUnmarshal(t *testing.T) {
 		Expected Polygon
 	}{
 		{
-			Input: `{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6]]}`,
+			Input: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[5.8,1.6]]]}`,
 			Expected: Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},
@@ -131,12 +131,12 @@ func TestPolygonUnmarshal(t *testing.T) {
 	}
 	// Fail
 	for _, testcase := range []string{
-		`{"type":"Polygoon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6]]}`,
+		`{"type":"Polygoon","coordinates":[[p1.2,3.4],[5.6,7.8],[5.8,1.6][]}`,
 		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6}}}`,
-		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8]]}`,
-		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8]]}`,
-		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[abc,-7.4]]}`,
-		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[-7.4,abc]]}`,
+		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8]]]}`,
+		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[5.8]]]}`,
+		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[abc,-7.4]]]}`,
+		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[-7.4,abc]]]}`,
 	} {
 		p := &Polygon{}
 		if err := p.UnmarshalJSON([]byte(testcase)); err == nil {

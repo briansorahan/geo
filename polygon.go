@@ -10,7 +10,7 @@ import (
 
 const (
 	polygonPrefix      = `POLYGON((`
-	polygonJSONPrefix1 = `{"type":"Polygon","coordinates":[`
+	polygonJSONPrefix1 = `{"type":"Polygon","coordinates":[[`
 	// BUG(briansorahan): unmarshal json regardless of field order
 )
 
@@ -47,7 +47,7 @@ func (polygon Polygon) Contains(point Point) bool {
 
 // MarshalJSON returns the GeoJSON representation of the polygon.
 func (polygon Polygon) MarshalJSON() ([]byte, error) {
-	s := `{"type":"Polygon","coordinates":[`
+	s := polygonJSONPrefix1
 	for i, point := range polygon {
 		if i == 0 {
 			s += "[" + strconv.FormatFloat(point[0], 'f', -1, 64) + ","
@@ -57,7 +57,7 @@ func (polygon Polygon) MarshalJSON() ([]byte, error) {
 			s += strconv.FormatFloat(point[1], 'f', -1, 64) + "]"
 		}
 	}
-	return []byte(s + "]}"), nil
+	return []byte(s + "]]}"), nil
 }
 
 // UnmarshalJSON unmarshals a polygon from GeoJSON.
@@ -65,7 +65,7 @@ func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 	var (
 		s            = string(data)
 		idx          = strings.Index(s, polygonJSONPrefix1)
-		lastBrackets = strings.LastIndex(s, "]}")
+		lastBrackets = strings.LastIndex(s, "]]}")
 	)
 	if idx != 0 || lastBrackets == -1 {
 		return fmt.Errorf("could not unmarshal polygon from %q", s)
