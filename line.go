@@ -8,12 +8,12 @@ const (
 	linestringJSONSuffix = `]}`
 )
 
-// Linestring is a line.
-type Linestring [][2]float64
+// Line is a line.
+type Line [][2]float64
 
 // Compare compares one linestring to another.
-func (linestring Linestring) Compare(other Geometry) bool {
-	ls, ok := other.(*Linestring)
+func (linestring Line) Compare(other Geometry) bool {
+	ls, ok := other.(*Line)
 	if !ok {
 		return false
 	}
@@ -21,12 +21,12 @@ func (linestring Linestring) Compare(other Geometry) bool {
 }
 
 // MarshalJSON marshals the linestring to JSON.
-func (linestring Linestring) MarshalJSON() ([]byte, error) {
+func (linestring Line) MarshalJSON() ([]byte, error) {
 	return pointsMarshalJSON(linestring, linestringJSONPrefix, linestringJSONSuffix), nil
 }
 
 // UnmarshalJSON unmarshals the linestring from JSON.
-func (linestring *Linestring) UnmarshalJSON(data []byte) error {
+func (linestring *Line) UnmarshalJSON(data []byte) error {
 	points, err := pointsUnmarshalJSON(data, linestringJSONPrefix, linestringJSONSuffix)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (linestring *Linestring) UnmarshalJSON(data []byte) error {
 }
 
 // String converts the linestring to a string.
-func (linestring Linestring) String() string {
+func (linestring Line) String() string {
 	if len(linestring) == 0 {
 		return linestringWKTEmpty
 	}

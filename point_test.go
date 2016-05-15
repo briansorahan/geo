@@ -15,7 +15,7 @@ func TestPointCompare(t *testing.T) {
 		},
 		{
 			G1: &Point{1.2, 3.4},
-			G2: &Linestring{{9.2, 3.7}},
+			G2: &Line{{9.2, 3.7}},
 		},
 		{
 			G1: &Point{1.2, 3.4},

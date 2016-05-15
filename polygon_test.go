@@ -81,7 +81,7 @@ func TestPolygonCompare(t *testing.T) {
 				{1.4, 9.3},
 				{-1.7, 7.3},
 			},
-			P2: &Linestring{
+			P2: &Line{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{1.4, 9.3},
