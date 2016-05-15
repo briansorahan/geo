@@ -4,96 +4,68 @@ import "testing"
 
 func TestPointCompare(t *testing.T) {
 	// Different
-	for _, testcase := range []struct {
-		P1 Point
-		P2 Point
-	}{
+	compareTestcases{
 		{
-			P1: Point{1.2, 3.4},
-			P2: Point{1.2, 3.7},
+			G1: &Point{1.2, 3.4},
+			G2: &Point{1.2, 3.7},
 		},
 		{
-			P1: Point{1.2, 3.4},
-			P2: Point{9.2, 3.7},
+			G1: &Point{1.2, 3.4},
+			G2: &Point{9.2, 3.7},
 		},
-	} {
-
-		if same := testcase.P1.Compare(testcase.P2); same {
-			t.Fatalf("expected %s, got %s", testcase.P1.String(), testcase.P2.String())
-		}
-	}
+		{
+			G1: &Point{1.2, 3.4},
+			G2: &Linestring{{9.2, 3.7}},
+		},
+		{
+			G1: &Point{1.2, 3.4},
+			G2: &Polygon{{9.2, 3.7}},
+		},
+	}.fail(t)
 }
 
 func TestPointMarshal(t *testing.T) {
-	for _, testcase := range []struct {
-		P        Point
-		Expected string
-	}{
+	marshalTestcases{
 		{
-			P:        Point{1.2, 3.4},
+			Input:    &Point{1.2, 3.4},
 			Expected: `{"type":"Point","coordinates":[1.2,3.4]}`,
 		},
-	} {
-		got, err := testcase.P.MarshalJSON()
-		if err != nil {
-			t.Fatal(err)
-		}
-		if string(got) != testcase.Expected {
-			t.Fatalf("expected %s, got %s", testcase.Expected, string(got))
-		}
-	}
+	}.pass(t)
 }
 
 func TestPointUnmarshal(t *testing.T) {
 	// Pass
-	for _, testcase := range []struct {
-		Input    string
-		Expected Point
-	}{
+	unmarshalTestcases{
 		{
 			Input:    `{"type":"Point","coordinates":[1.2,3.4]}`,
-			Expected: Point{1.2, 3.4},
+			Expected: &Point{1.2, 3.4},
+			Instance: &Point{},
 		},
-	} {
-		p := &Point{}
-		if err := p.UnmarshalJSON([]byte(testcase.Input)); err != nil {
-			t.Fatal(err)
-		}
-		if !p.Compare(testcase.Expected) {
-			t.Fatalf("expected %s, got %s", testcase.Expected.String(), p.String())
-		}
-	}
+	}.pass(t)
+
 	// Fail
-	for _, testcase := range []struct {
-		Input    string
-		Expected Point
-	}{
+	unmarshalTestcases{
 		{
 			Input:    `{"type":"Pont","coordinates":[1.2,3.4]}`,
-			Expected: Point{1.2, 3.4},
+			Instance: &Point{},
 		},
 		{
 			Input:    `{"type":"Point","coordinates":[1.2]}`,
-			Expected: Point{1.2, 3.4},
+			Instance: &Point{},
 		},
 		{
 			Input:    `{"type":"Point","coordinates":[1.2,3.4}}`,
-			Expected: Point{1.2, 3.4},
+			Instance: &Point{},
 		},
 		{
 			Input:    `{"type":"Point","coordinates":[abc,3.4]}`,
-			Expected: Point{1.2, 3.4},
+			Instance: &Point{},
 		},
 		{
 			Input:    `{"type":"Point","coordinates":[1.2,abc]}`,
-			Expected: Point{1.2, 3.4},
+			Instance: &Point{},
 		},
-	} {
-		p := &Point{}
-		if err := p.UnmarshalJSON([]byte(testcase.Input)); err == nil {
-			t.Fatal("expected error, but got nil")
-		}
-	}
+	}.fail(t)
 }
 
 func TestPointScan(t *testing.T) {

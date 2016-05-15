@@ -6,7 +6,7 @@ func TestPolygonCompare(t *testing.T) {
 	// Same
 	for _, testcase := range []struct {
 		P1 Polygon
-		P2 Polygon
+		P2 *Polygon
 	}{
 		{
 			P1: Polygon{
@@ -15,7 +15,7 @@ func TestPolygonCompare(t *testing.T) {
 				{1.4, 9.3},
 				{-1.7, 7.3},
 			},
-			P2: Polygon{
+			P2: &Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{1.4, 9.3},
@@ -31,7 +31,7 @@ func TestPolygonCompare(t *testing.T) {
 	// Different
 	for _, testcase := range []struct {
 		P1 Polygon
-		P2 Polygon
+		P2 Geometry
 	}{
 		{
 			P1: Polygon{
@@ -40,7 +40,7 @@ func TestPolygonCompare(t *testing.T) {
 				{1.4, 9.3},
 				{-1.7, 7.3},
 			},
-			P2: Polygon{
+			P2: &Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{1.4, 9.3},
@@ -53,7 +53,7 @@ func TestPolygonCompare(t *testing.T) {
 				{1.4, 9.3},
 				{-1.7, 7.3},
 			},
-			P2: Polygon{
+			P2: &Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{1.4, 9.3},
@@ -67,12 +67,35 @@ func TestPolygonCompare(t *testing.T) {
 				{1.4, 9.3},
 				{-1.7, 7.3},
 			},
-			P2: Polygon{
+			P2: &Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{1.4, 9.3},
 				{-1.7, 7.5},
 			},
+		},
+		{
+			P1: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+			P2: &Linestring{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.5},
+			},
+		},
+		{
+			P1: Polygon{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
+			},
+			P2: &Point{1.2, 3.4},
 		},
 	} {
 
@@ -110,11 +133,11 @@ func TestPolygonUnmarshal(t *testing.T) {
 	// Pass
 	for _, testcase := range []struct {
 		Input    string
-		Expected Polygon
+		Expected Geometry
 	}{
 		{
 			Input: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[5.8,1.6]]]}`,
-			Expected: Polygon{
+			Expected: &Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{5.8, 1.6},
@@ -152,7 +175,7 @@ func TestPolygonScan(t *testing.T) {
 		Expected Polygon
 	}{
 		{
-			WKT: "POLYGON((1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4)",
+			WKT: "POLYGON((1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4))",
 			Expected: Polygon{
 				{1.2, 3.4},
 				{5.6, 7.8},

@@ -1,22 +1,6 @@
 package geo
 
-import (
-	"errors"
-	"testing"
-)
-
-// BadGeom is a type that always returns an error from MarshalJSON and UnmarshalJSON.
-type BadGeom struct{}
-
-// MarshalJSON always returns an error.
-func (badgeom BadGeom) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("bad geom")
-}
-
-// UnmarshalJSON always returns an error.
-func (badgeom BadGeom) UnmarshalJSON(data []byte) error {
-	return errors.New("bad geom")
-}
+import "testing"
 
 func TestFeatureMarshal(t *testing.T) {
 	// Pass
@@ -44,8 +28,8 @@ func TestFeatureMarshal(t *testing.T) {
 		Feature  Feature
 		Expected string
 	}{
-		{Feature: Feature{Geometry: &BadGeom{}}},
-		{Feature: Feature{Geometry: &Point{1, 2}, Properties: &BadGeom{}}},
+		{Feature: Feature{Geometry: badGeom{}}},
+		{Feature: Feature{Geometry: &Point{1, 2}, Properties: badGeom{}}},
 	} {
 
 		if _, err := testcase.Feature.MarshalJSON(); err == nil {

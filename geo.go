@@ -2,9 +2,7 @@
 // and operations on them.
 package geo
 
-import (
-	"encoding/json"
-)
+import "encoding/json"
 
 // Margin is a value used to fudge equality when two floats are very close to each other.
 var Margin = 1e-100
@@ -13,4 +11,6 @@ var Margin = 1e-100
 type Geometry interface {
 	json.Marshaler
 	json.Unmarshaler
+	Compare(other Geometry) bool
+	String() string
 }

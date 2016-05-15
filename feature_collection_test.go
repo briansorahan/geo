@@ -41,7 +41,7 @@ func TestFeatureCollectionMarshal(t *testing.T) {
 		{
 			Coll: FeatureCollection{
 				{
-					Geometry: &BadGeom{},
+					Geometry: badGeom{},
 				},
 				{
 					Geometry: &Polygon{

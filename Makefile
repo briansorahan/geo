@@ -1,6 +1,9 @@
 install:
 	@go install
 
+lint:
+	@gometalinter
+
 test:
 	@go test
 
