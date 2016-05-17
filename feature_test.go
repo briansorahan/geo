@@ -63,6 +63,21 @@ func TestFeatureUnmarshal(t *testing.T) {
 				Geometry: &Point{},
 			},
 		},
+		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-113.1454418321263,33.52932582146817],[-113.1454418321263,33.52897252424949],[-113.1454027724575,33.52897252424949],[-113.1454027724575,33.52932582146817],[-113.1454418321263,33.52932582146817]]]}}`),
+			Expected: Feature{
+				Geometry: &Polygon{
+					{-113.1454418321263, 33.52932582146817},
+					{-113.1454418321263, 33.52897252424949},
+					{-113.1454027724575, 33.52897252424949},
+					{-113.1454027724575, 33.52932582146817},
+					{-113.1454418321263, 33.52932582146817},
+				},
+			},
+			Instance: &Feature{
+				Geometry: &Polygon{},
+			},
+		},
 	} {
 		if err := testcase.Instance.UnmarshalJSON(testcase.Input); err != nil {
 			t.Fatal(err)
