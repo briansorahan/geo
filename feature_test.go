@@ -37,3 +37,64 @@ func TestFeatureMarshal(t *testing.T) {
 		}
 	}
 }
+
+func TestFeatureUnmarshal(t *testing.T) {
+	// Pass
+	for _, testcase := range []struct {
+		Input    []byte
+		Expected Feature
+		Instance *Feature
+	}{
+		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null}`),
+			Expected: Feature{
+				Geometry: &Point{1, 2},
+			},
+			Instance: &Feature{
+				Geometry: &Point{},
+			},
+		},
+		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[3,2.5]}}`),
+			Expected: Feature{
+				Geometry: &Point{3, 2.5},
+			},
+			Instance: &Feature{
+				Geometry: &Point{},
+			},
+		},
+	} {
+		if err := testcase.Instance.UnmarshalJSON(testcase.Input); err != nil {
+			t.Fatal(err)
+		}
+		if expected, got := testcase.Expected.Geometry, testcase.Instance.Geometry; !expected.Compare(got) {
+			t.Fatalf("expected %v, got %v", expected, got)
+		}
+	}
+	// Fail
+	for _, testcase := range []struct {
+		Input    []byte
+		Instance *Feature
+	}{
+		// "Feature" is misspelled
+		{
+			Input:    []byte(`{"type":"Faeture","geometry":{"type":"Point","coordinates":[1,2]},"properties":null}`),
+			Instance: &Feature{Geometry: &Point{}},
+		},
+		// Bad geometry Unmarshal
+		{
+			Input:    []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null}`),
+			Instance: &Feature{Geometry: badGeom{}},
+		},
+		// Bad JSON for properties
+		{
+			Input:    []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":{[['','':}}`),
+			Instance: &Feature{Geometry: &Point{}},
+		},
+	} {
+
+		if err := testcase.Instance.UnmarshalJSON(testcase.Input); err == nil {
+			t.Fatal("expected error, got nil")
+		}
+	}
+}
