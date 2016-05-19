@@ -32,15 +32,15 @@ func TestGeometry(t *testing.T) {
 	}
 	// Fail
 	for _, g := range []geometry{
-		geometry{
+		{
 			Type:        PointType,
 			Coordinates: json.RawMessage(`{/}`),
 		},
-		geometry{
+		{
 			Type:        LineType,
 			Coordinates: json.RawMessage(`{/}`),
 		},
-		geometry{
+		{
 			Type:        PolygonType,
 			Coordinates: json.RawMessage(`{/}`),
 		},
