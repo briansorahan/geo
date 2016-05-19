@@ -38,36 +38,6 @@ func (point Point) MarshalJSON() ([]byte, error) {
 	return []byte(s), nil
 }
 
-// Scan scans a point from Well Known Text.
-func (point *Point) Scan(src interface{}) error {
-	switch v := src.(type) {
-	case []byte:
-		if _, err := fmt.Sscanf(string(v), pointWKT, &point[0], &point[1]); err != nil {
-			return err
-		}
-	case string:
-		if _, err := fmt.Sscanf(v, pointWKT, &point[0], &point[1]); err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("could not scan point from %T", src)
-	}
-	return nil
-}
-
-// Value converts a point to Well Known Text.
-func (point Point) Value() (driver.Value, error) {
-	return point.String(), nil
-}
-
-// String convert the point to a string.
-func (point Point) String() string {
-	s := "POINT("
-	s += strconv.FormatFloat(point[0], 'f', -1, 64)
-	s += " " + strconv.FormatFloat(point[1], 'f', -1, 64) + ")"
-	return s
-}
-
 // RayhIntersects returns true if the horizontal ray going from
 // point to positive infinity intersects the line that connects a and b.
 func (point Point) RayhIntersects(a, b Point) bool {
@@ -91,4 +61,34 @@ func (point Point) RayhIntersects(a, b Point) bool {
 		return ((point[1] - bottom) / (point[0] - left)) >= slope
 	}
 	return ((point[1] - top) / (point[0] - left)) <= slope
+}
+
+// Scan scans a point from Well Known Text.
+func (point *Point) Scan(src interface{}) error {
+	switch v := src.(type) {
+	case []byte:
+		if _, err := fmt.Sscanf(string(v), pointWKT, &point[0], &point[1]); err != nil {
+			return err
+		}
+	case string:
+		if _, err := fmt.Sscanf(v, pointWKT, &point[0], &point[1]); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("could not scan point from %T", src)
+	}
+	return nil
+}
+
+// String convert the point to a string.
+func (point Point) String() string {
+	s := "POINT("
+	s += strconv.FormatFloat(point[0], 'f', -1, 64)
+	s += " " + strconv.FormatFloat(point[1], 'f', -1, 64) + ")"
+	return s
+}
+
+// Value converts a point to Well Known Text.
+func (point Point) Value() (driver.Value, error) {
+	return point.String(), nil
 }

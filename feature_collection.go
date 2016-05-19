@@ -1,5 +1,7 @@
 package geo
 
+import "encoding/json"
+
 const featureCollectionJSONPrefix = `{"type":"FeatureCollection","features":[`
 
 // FeatureCollection represents a GeoJSON feature collection.
@@ -9,7 +11,7 @@ type FeatureCollection []Feature
 func (coll FeatureCollection) MarshalJSON() ([]byte, error) {
 	buf := []byte(featureCollectionJSONPrefix)
 	for i, feature := range coll {
-		feat, err := feature.MarshalJSON()
+		feat, err := json.Marshal(feature)
 		if err != nil {
 			return nil, err
 		}

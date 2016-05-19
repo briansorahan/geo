@@ -1,6 +1,9 @@
 package geo
 
-import "testing"
+import (
+	"database/sql/driver"
+	"testing"
+)
 
 func TestLineCompare(t *testing.T) {
 	// Pass
@@ -105,6 +108,26 @@ func TestLineString(t *testing.T) {
 	} {
 		if expected, got := testcase.Expected, testcase.Input.String(); expected != got {
 			t.Fatalf("expected %s, got %s", expected, got)
+		}
+	}
+}
+
+func TestLineValue(t *testing.T) {
+	for _, c := range []struct {
+		Input    Line
+		Expected driver.Value
+	}{
+		{
+			Input:    Line{{0, 0}, {1, 1}},
+			Expected: driver.Value(`LINESTRING(0 0, 1 1)`),
+		},
+	} {
+		val, err := c.Input.Value()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if val != c.Expected {
+			t.Fatalf("expected %v, got %v", c.Expected, val)
 		}
 	}
 }

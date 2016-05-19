@@ -1,6 +1,9 @@
 package geo
 
-import "fmt"
+import (
+	"database/sql/driver"
+	"fmt"
+)
 
 const (
 	lineWKTEmpty   = `LINESTRING EMPTY`
@@ -12,7 +15,7 @@ const (
 // Line is a line.
 type Line [][2]float64
 
-// Compare compares one linestring to another.
+// Compare compares one line to another.
 func (line Line) Compare(g Geometry) bool {
 	ls, ok := g.(*Line)
 	if !ok {
@@ -50,4 +53,9 @@ func (line Line) String() string {
 		return lineWKTEmpty
 	}
 	return lineWKTPrefix + pointsString(line)
+}
+
+// Value returns a driver Value.
+func (line Line) Value() (driver.Value, error) {
+	return line.String(), nil
 }

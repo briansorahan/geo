@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"testing"
@@ -81,7 +82,7 @@ func (tests unmarshalTestcases) fail(t *testing.T) {
 type badGeom struct{}
 
 // Compare always returns false
-func (badgeom badGeom) Compare(other Geometry) bool {
+func (badgeom badGeom) Compare(g Geometry) bool {
 	return false
 }
 
@@ -90,12 +91,22 @@ func (badgeom badGeom) MarshalJSON() ([]byte, error) {
 	return nil, errors.New("bad geom")
 }
 
-// UnmarshalJSON always returns an error.
-func (badgeom badGeom) UnmarshalJSON(data []byte) error {
+// Scan always returns an error.
+func (badgeom badGeom) Scan(src interface{}) error {
 	return errors.New("bad geom")
 }
 
 // String always returns "badgeom"
 func (badgeom badGeom) String() string {
 	return "badgeom"
+}
+
+// UnmarshalJSON always returns an error.
+func (badgeom badGeom) UnmarshalJSON(data []byte) error {
+	return errors.New("bad geom")
+}
+
+// Value always returns an error.
+func (badgeom badGeom) Value() (driver.Value, error) {
+	return nil, errors.New("bad geom")
 }

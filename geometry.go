@@ -1,6 +1,8 @@
 package geo
 
 import (
+	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 )
@@ -14,8 +16,10 @@ const (
 
 // Geometry defines the interface of every geometry type.
 type Geometry interface {
+	driver.Valuer
 	json.Marshaler
-	Compare(other Geometry) bool
+	sql.Scanner
+	Compare(g Geometry) bool
 	String() string
 }
 
