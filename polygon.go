@@ -71,14 +71,7 @@ func (polygon Polygon) MarshalJSON() ([]byte, error) {
 
 // Scan scans a polygon from Well Known Text.
 func (polygon *Polygon) Scan(src interface{}) error {
-	switch v := src.(type) {
-	case []byte:
-		return polygon.scan(string(v))
-	case string:
-		return polygon.scan(v)
-	default:
-		return fmt.Errorf("could not scan polygon from %T", src)
-	}
+	return scan(polygon, src)
 }
 
 // scan scans a polygon from a Well Known Text string.

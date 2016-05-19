@@ -28,14 +28,7 @@ func (line Line) MarshalJSON() ([]byte, error) {
 
 // Scan scans a line from Well Known Text.
 func (line *Line) Scan(src interface{}) error {
-	switch v := src.(type) {
-	case []byte:
-		return line.scan(string(v))
-	case string:
-		return line.scan(v)
-	default:
-		return fmt.Errorf("could not scan line from %T", src)
-	}
+	return scan(line, src)
 }
 
 // scan scans a line from a Well Known Text string.
