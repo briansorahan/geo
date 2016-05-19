@@ -29,7 +29,7 @@ type geometry struct {
 func (g geometry) Geometry() (Geometry, error) {
 	switch g.Type {
 	default:
-		return nil, fmt.Errorf("%s unrecognized geometry type: %s", g.Type)
+		return nil, fmt.Errorf("unrecognized geometry type: %s", g.Type)
 	case PointType:
 		p := &Point{}
 		if err := json.Unmarshal(g.Coordinates, p); err != nil {

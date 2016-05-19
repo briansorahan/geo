@@ -17,12 +17,12 @@ type Feature struct {
 }
 
 // MarshalJSON marshals the feature to GeoJSON.
-func (feature Feature) MarshalJSON() ([]byte, error) {
-	geom, err := feature.Geometry.MarshalJSON()
+func (f Feature) MarshalJSON() ([]byte, error) {
+	geom, err := f.Geometry.MarshalJSON()
 	if err != nil {
 		return nil, err
 	}
-	props, err := json.Marshal(feature.Properties)
+	props, err := json.Marshal(f.Properties)
 	if err != nil {
 		return nil, err
 	}

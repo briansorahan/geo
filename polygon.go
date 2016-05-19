@@ -20,20 +20,20 @@ var (
 type Polygon [][][2]float64
 
 // Compare compares one polygon to another.
-func (p1 Polygon) Compare(g Geometry) bool {
-	p2, ok := g.(*Polygon)
+func (polygon Polygon) Compare(g Geometry) bool {
+	p, ok := g.(*Polygon)
 	if !ok {
 		return false
 	}
-	if len(p1) != len(*p2) {
+	if len(polygon) != len(*p) {
 		return false
 	}
-	for i, pp1 := range p1 {
-		pp2 := (*p2)[i]
-		if len(pp1) != len(pp2) {
+	for i, p1 := range polygon {
+		p2 := (*p)[i]
+		if len(p1) != len(p2) {
 			return false
 		}
-		if !pointsCompare(pp1, pp2) {
+		if !pointsCompare(p1, p2) {
 			return false
 		}
 	}
