@@ -13,8 +13,8 @@ const (
 type Line [][2]float64
 
 // Compare compares one linestring to another.
-func (line Line) Compare(other Geometry) bool {
-	ls, ok := other.(*Line)
+func (line Line) Compare(g Geometry) bool {
+	ls, ok := g.(*Line)
 	if !ok {
 		return false
 	}

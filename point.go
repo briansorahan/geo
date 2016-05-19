@@ -16,8 +16,8 @@ const (
 type Point [2]float64
 
 // Compare compares one point to another.
-func (point Point) Compare(other Geometry) bool {
-	pt, ok := other.(*Point)
+func (point Point) Compare(g Geometry) bool {
+	pt, ok := g.(*Point)
 	if !ok {
 		return false
 	}
