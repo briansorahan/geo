@@ -10,16 +10,20 @@ func TestPolygonCompare(t *testing.T) {
 	}{
 		{
 			P1: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
 			},
 			P2: &Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
 			},
 		},
 	} {
@@ -35,51 +39,87 @@ func TestPolygonCompare(t *testing.T) {
 	}{
 		{
 			P1: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
 			},
 			P2: &Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+				},
 			},
 		},
 		{
 			P1: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+				},
 			},
 			P2: &Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.4, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+				},
 			},
 		},
 		{
 			P1: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
 			},
 			P2: &Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.5},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.4, 7.3},
+				},
 			},
 		},
 		{
 			P1: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
+			},
+			P2: &Polygon{
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.5},
+				},
+			},
+		},
+		{
+			P1: Polygon{
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
 			},
 			P2: &Line{
 				{1.2, 3.4},
@@ -90,10 +130,12 @@ func TestPolygonCompare(t *testing.T) {
 		},
 		{
 			P1: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{1.4, 9.3},
-				{-1.7, 7.3},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{1.4, 9.3},
+					{-1.7, 7.3},
+				},
 			},
 			P2: &Point{1.2, 3.4},
 		},
@@ -107,65 +149,32 @@ func TestPolygonCompare(t *testing.T) {
 
 func TestPolygonMarshal(t *testing.T) {
 	// Pass
-	for _, testcase := range []struct {
-		Polygon  Polygon
-		Expected string
-	}{
+	marshalTestcases{
 		{
-			Polygon: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
+			Input: &Polygon{
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+				},
 			},
 			Expected: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8]]]}`,
 		},
-	} {
-		got, err := testcase.Polygon.MarshalJSON()
-		if err != nil {
-			t.Fatal(err)
-		}
-		if string(got) != testcase.Expected {
-			t.Fatalf("expected %s, got %s", testcase.Expected, string(got))
-		}
-	}
-}
-
-func TestPolygonUnmarshal(t *testing.T) {
-	// Pass
-	for _, testcase := range []struct {
-		Input    string
-		Expected Geometry
-	}{
 		{
-			Input: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[5.8,1.6]]]}`,
-			Expected: &Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{5.8, 1.6},
+			Input: &Polygon{
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{2, 6},
+				},
+				{
+					{0, 0},
+					{0, 1},
+					{1, 0},
+				},
 			},
+			Expected: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[2,6]],[[0,0],[0,1],[1,0]]]}`,
 		},
-	} {
-		p := &Polygon{}
-		if err := p.UnmarshalJSON([]byte(testcase.Input)); err != nil {
-			t.Fatal(err)
-		}
-		if !p.Compare(testcase.Expected) {
-			t.Fatalf("expected %s to equal %s", p.String(), testcase.Expected.String())
-		}
-	}
-	// Fail
-	for _, testcase := range []string{
-		`{"type":"Polygoon","coordinates":[[p1.2,3.4],[5.6,7.8],[5.8,1.6][]}`,
-		`{"type":"Polygon","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6}}}`,
-		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8]]]}`,
-		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[5.8]]]}`,
-		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[abc,-7.4]]]}`,
-		`{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[-7.4,abc]]]}`,
-	} {
-		p := &Polygon{}
-		if err := p.UnmarshalJSON([]byte(testcase)); err == nil {
-			t.Fatal("expected error, got nil")
-		}
-	}
+	}.pass(t)
 }
 
 func TestPolygonScan(t *testing.T) {
@@ -177,10 +186,12 @@ func TestPolygonScan(t *testing.T) {
 		{
 			WKT: "POLYGON((1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4))",
 			Expected: Polygon{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{6.2, 1.5},
-				{1.2, 3.4},
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+					{6.2, 1.5},
+					{1.2, 3.4},
+				},
 			},
 		},
 	} {
@@ -208,7 +219,7 @@ func TestPolygonScan(t *testing.T) {
 	} {
 		p := &Polygon{}
 		if err := p.Scan(testcase); err == nil {
-			t.Fatalf("expected err, got nil")
+			t.Fatalf("expected err, got nil for %s", testcase.(string))
 		}
 	}
 }
@@ -216,10 +227,12 @@ func TestPolygonScan(t *testing.T) {
 func TestPolygonValue(t *testing.T) {
 	var (
 		p = Polygon{
-			{1.2, 3.4},
-			{5.6, 7.8},
-			{8.7, 6.5},
-			{4.3, 2.1},
+			{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{8.7, 6.5},
+				{4.3, 2.1},
+			},
 		}
 		expected = `POLYGON((1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1))`
 	)
@@ -263,11 +276,13 @@ func TestPolygonContains(t *testing.T) {
 		// Square
 		{
 			Poly: Polygon{
-				{0, 0},
-				{2, 0},
-				{2, 2},
-				{0, 2},
-				{0, 0},
+				{
+					{0, 0},
+					{2, 0},
+					{2, 2},
+					{0, 2},
+					{0, 0},
+				},
 			},
 			Inside: []Point{
 				{1, 1},
@@ -279,13 +294,15 @@ func TestPolygonContains(t *testing.T) {
 		// Hexagon
 		{
 			Poly: Polygon{
-				{0, 1},
-				{1, 2},
-				{2, 1},
-				{2, 0},
-				{1, -1},
-				{0, 0},
-				{0, 1},
+				{
+					{0, 1},
+					{1, 2},
+					{2, 1},
+					{2, 0},
+					{1, -1},
+					{0, 0},
+					{0, 1},
+				},
 			},
 			Inside: []Point{
 				{1, 0},
@@ -294,11 +311,13 @@ func TestPolygonContains(t *testing.T) {
 		// A tilted quadrilateral
 		{
 			Poly: Polygon{
-				{-1, 10},
-				{10, 1},
-				{1, -10},
-				{-10, -1},
-				{-1, 10},
+				{
+					{-1, 10},
+					{10, 1},
+					{1, -10},
+					{-10, -1},
+					{-1, 10},
+				},
 			},
 			Inside: []Point{
 				{2, 2},
@@ -319,6 +338,34 @@ func TestPolygonContains(t *testing.T) {
 					t.Fatalf("Expected polygon %v to not contain point %v", testcase.Poly, point)
 				}
 			}
+		}
+	}
+}
+
+func TestPolygonString(t *testing.T) {
+	for _, c := range []struct {
+		Input    Polygon
+		Expected string
+	}{
+		{
+			Input: Polygon{
+				{
+					{-4, -4},
+					{-4, 4},
+					{4, 4},
+					{4, -4},
+				},
+				{
+					{0, 0},
+					{1, 0},
+					{0, 1},
+				},
+			},
+			Expected: `POLYGON((-4 -4, -4 4, 4 4, 4 -4),(0 0, 1 0, 0 1))`,
+		},
+	} {
+		if expected, got := c.Expected, c.Input.String(); expected != got {
+			t.Fatalf("expected %s, got %s", expected, got)
 		}
 	}
 }

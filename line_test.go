@@ -27,7 +27,7 @@ func TestLineCompare(t *testing.T) {
 		},
 		{
 			G1: &Line{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.3}},
-			G2: &Polygon{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.5}},
+			G2: &Polygon{{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.5}}},
 		},
 		{
 			G1: &Line{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.3}},
@@ -46,32 +46,40 @@ func TestLineMarshal(t *testing.T) {
 	}.pass(t)
 }
 
-func TestLineUnmarshal(t *testing.T) {
+func TestLineScan(t *testing.T) {
 	// Pass
-	unmarshalTestcases{
+	for _, c := range []struct {
+		Input    interface{}
+		Expected Geometry
+	}{
 		{
-			Input: `{"type":"LineString","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6]]}`,
-			Expected: &Line{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{5.8, 1.6},
-			},
-			Instance: &Line{},
+			Input:    []byte(`LINESTRING(0 0, 1 1)`),
+			Expected: &Line{{0, 0}, {1, 1}},
 		},
-	}.pass(t)
+		{
+			Input:    `LINESTRING(0 2, 0 3, -1.12654 5.985)`,
+			Expected: &Line{{0, 2}, {0, 3}, {-1.12654, 5.985}},
+		},
+	} {
+		l := &Line{}
+		if err := l.Scan(c.Input); err != nil {
+			t.Fatalf("could not scan %v: %s", c.Input, err)
+		}
+		if !l.Compare(c.Expected) {
+			t.Fatalf("expected %v, got %v", c.Expected, l)
+		}
+	}
 
 	// Fail
-	for _, testcase := range []string{
-		`{"type":"LineStirng","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6]]}`,
-		`{"type":"LineString","coordinates":[[1.2,3.4],[5.6,7.8],[5.8,1.6}}}`,
-		`{"type":"LineString","coordinates":[[1.2,3.4],[5.6,7.8>>>`,
-		`{"type":"LineString","coordinates":[[1.2,3.4],[5.6,7.8],[5.8]]}`,
-		`{"type":"LineString","coordinates":[[1.2,3.4],[5.6,7.8],[abc,-7.4]]}`,
-		`{"type":"LineString","coordinates":[[1.2,3.4],[5.6,7.8],[-7.4,abc]]}`,
+	for _, c := range []interface{}{
+		4,        // wrong type
+		`LINE()`, // wrong prefix
+		[]byte(`LINESTRING((3 3, 2 2))`), // too many parentheses
+		`LINESTRING(0, 0, 1, 1)`,         // should be spaces in between coordinates
 	} {
-		p := &Line{}
-		if err := p.UnmarshalJSON([]byte(testcase)); err == nil {
-			t.Fatal("expected error, got nil")
+		l := &Line{}
+		if err := l.Scan(c); err == nil {
+			t.Fatalf("expected error, got nil for %v", c)
 		}
 	}
 }

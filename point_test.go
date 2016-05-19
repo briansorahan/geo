@@ -19,7 +19,7 @@ func TestPointCompare(t *testing.T) {
 		},
 		{
 			G1: &Point{1.2, 3.4},
-			G2: &Polygon{{9.2, 3.7}},
+			G2: &Polygon{{{9.2, 3.7}}},
 		},
 	}.fail(t)
 }
@@ -31,41 +31,6 @@ func TestPointMarshal(t *testing.T) {
 			Expected: `{"type":"Point","coordinates":[1.2,3.4]}`,
 		},
 	}.pass(t)
-}
-
-func TestPointUnmarshal(t *testing.T) {
-	// Pass
-	unmarshalTestcases{
-		{
-			Input:    `{"type":"Point","coordinates":[1.2,3.4]}`,
-			Expected: &Point{1.2, 3.4},
-			Instance: &Point{},
-		},
-	}.pass(t)
-
-	// Fail
-	unmarshalTestcases{
-		{
-			Input:    `{"type":"Pont","coordinates":[1.2,3.4]}`,
-			Instance: &Point{},
-		},
-		{
-			Input:    `{"type":"Point","coordinates":[1.2]}`,
-			Instance: &Point{},
-		},
-		{
-			Input:    `{"type":"Point","coordinates":[1.2,3.4}}`,
-			Instance: &Point{},
-		},
-		{
-			Input:    `{"type":"Point","coordinates":[abc,3.4]}`,
-			Instance: &Point{},
-		},
-		{
-			Input:    `{"type":"Point","coordinates":[1.2,abc]}`,
-			Instance: &Point{},
-		},
-	}.fail(t)
 }
 
 func TestPointScan(t *testing.T) {

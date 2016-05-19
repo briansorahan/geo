@@ -1,7 +1,6 @@
 package geo
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -38,54 +37,41 @@ func pointsMarshalJSON(points [][2]float64, prefix, suffix string) []byte {
 	return []byte(s + suffix)
 }
 
-// pointsUnmarshalJSON unmarshals some points from JSON.
-func pointsUnmarshalJSON(data []byte, prefix, suffix string) ([][2]float64, error) {
-	var (
-		points       = [][2]float64{}
-		s            = string(data)
-		idx          = strings.Index(s, prefix)
-		lastBrackets = strings.LastIndex(s, suffix)
-	)
-	if idx != 0 || lastBrackets == -1 {
-		return nil, fmt.Errorf("could not unmarshal points from %q", s)
+// pointsScan scans a list of points from Well Known Text.
+// The points should look like (X0 Y0,X1 Y1,X2 Y2)
+func pointsScan(s string) ([][2]float64, error) {
+	if s[0] != '(' || s[len(s)-1] != ')' {
+		return nil, fmt.Errorf("could not scan points from %s", s)
 	}
-	pts := strings.Split(s[len(prefix):lastBrackets], "],[")
-	if len(pts) < 3 {
-		return nil, errors.New("polygon must contain at least 3 points")
-	}
-	for i, p := range pts {
-		var coords []string
-		if i == 0 {
-			coords = strings.Split(p[1:], ",")
-		} else if i == len(pts)-1 {
-			coords = strings.Split(p[:len(p)-1], ",")
-		} else {
-			coords = strings.Split(p, ",")
+	points := [][2]float64{}
+	for _, coords := range strings.Split(s[1:len(s)-1], ",") {
+		var (
+			pair = [2]float64{}
+			xy   = strings.Split(strings.TrimSpace(coords), " ")
+		)
+		if len(xy) != 2 {
+			return nil, fmt.Errorf("could not scan points from %s", s)
 		}
-		if len(coords) != 2 {
-			return nil, fmt.Errorf("could not unmarshal points from %q", s)
+		for i, val := range xy {
+			f, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				return nil, err
+			}
+			pair[i] = f
 		}
-		c1, err := strconv.ParseFloat(coords[0], 64)
-		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal points from %q", s)
-		}
-		c2, err := strconv.ParseFloat(coords[1], 64)
-		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal points from %q", s)
-		}
-		points = append(points, [2]float64{c1, c2})
+		points = append(points, pair)
 	}
 	return points, nil
 }
 
-// pointsString converts a slice of points to a string.
-func pointsString(points [][2]float64, prefix, suffix string) string {
-	s := prefix
+// pointsString converts a slice of points to Well Known Text.
+func pointsString(points [][2]float64) string {
+	s := "("
 	s += strconv.FormatFloat(points[0][0], 'f', -1, 64)
 	s += " " + strconv.FormatFloat(points[0][1], 'f', -1, 64)
 	for _, coord := range points[1:] {
 		s += ", " + strconv.FormatFloat(coord[0], 'f', -1, 64)
 		s += " " + strconv.FormatFloat(coord[1], 'f', -1, 64)
 	}
-	return s + suffix
+	return s + ")"
 }

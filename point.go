@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -37,32 +36,6 @@ func (point Point) MarshalJSON() ([]byte, error) {
 	s += strconv.FormatFloat(point[0], 'f', -1, 64) + ","
 	s += strconv.FormatFloat(point[1], 'f', -1, 64) + "]}"
 	return []byte(s), nil
-}
-
-// UnmarshalJSON unmarshals a point from GeoJSON.
-func (point *Point) UnmarshalJSON(data []byte) error {
-	var (
-		s           = string(data)
-		idx         = strings.Index(s, pointJSONPrefix)
-		lastBracket = strings.LastIndex(s, "]")
-	)
-	if idx != 0 || lastBracket == -1 {
-		return fmt.Errorf("could not unmarshal point from %q", s)
-	}
-	coords := strings.Split(s[len(pointJSONPrefix):lastBracket], ",")
-	if len(coords) != 2 {
-		return fmt.Errorf("could not unmarshal point from %q", s)
-	}
-	c1, err := strconv.ParseFloat(coords[0], 64)
-	if err != nil {
-		return fmt.Errorf("could not unmarshal point from %q", s)
-	}
-	c2, err := strconv.ParseFloat(coords[1], 64)
-	if err != nil {
-		return fmt.Errorf("could not unmarshal point from %q", s)
-	}
-	point[0], point[1] = c1, c2
-	return nil
 }
 
 // Scan scans a point from Well Known Text.

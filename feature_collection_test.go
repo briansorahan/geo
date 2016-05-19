@@ -15,10 +15,12 @@ func TestFeatureCollectionMarshal(t *testing.T) {
 				},
 				{
 					Geometry: &Polygon{
-						{1, 1},
-						{1, -1},
-						{-1, -1},
-						{-1, 1},
+						{
+							{1, 1},
+							{1, -1},
+							{-1, -1},
+							{-1, 1},
+						},
 					},
 				},
 			},
@@ -45,10 +47,12 @@ func TestFeatureCollectionMarshal(t *testing.T) {
 				},
 				{
 					Geometry: &Polygon{
-						{1, 1},
-						{1, -1},
-						{-1, -1},
-						{-1, 1},
+						{
+							{1, 1},
+							{1, -1},
+							{-1, -1},
+							{-1, 1},
+						},
 					},
 				},
 			},

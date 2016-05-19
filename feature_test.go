@@ -1,6 +1,9 @@
 package geo
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestFeatureMarshal(t *testing.T) {
 	// Pass
@@ -67,11 +70,13 @@ func TestFeatureUnmarshal(t *testing.T) {
 			Input: []byte(`{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-113.1454418321263,33.52932582146817],[-113.1454418321263,33.52897252424949],[-113.1454027724575,33.52897252424949],[-113.1454027724575,33.52932582146817],[-113.1454418321263,33.52932582146817]]]}}`),
 			Expected: Feature{
 				Geometry: &Polygon{
-					{-113.1454418321263, 33.52932582146817},
-					{-113.1454418321263, 33.52897252424949},
-					{-113.1454027724575, 33.52897252424949},
-					{-113.1454027724575, 33.52932582146817},
-					{-113.1454418321263, 33.52932582146817},
+					{
+						{-113.1454418321263, 33.52932582146817},
+						{-113.1454418321263, 33.52897252424949},
+						{-113.1454027724575, 33.52897252424949},
+						{-113.1454027724575, 33.52932582146817},
+						{-113.1454418321263, 33.52932582146817},
+					},
 				},
 			},
 			Instance: &Feature{
@@ -79,7 +84,7 @@ func TestFeatureUnmarshal(t *testing.T) {
 			},
 		},
 	} {
-		if err := testcase.Instance.UnmarshalJSON(testcase.Input); err != nil {
+		if err := json.Unmarshal(testcase.Input, testcase.Instance); err != nil {
 			t.Fatal(err)
 		}
 		if expected, got := testcase.Expected.Geometry, testcase.Instance.Geometry; !expected.Compare(got) {
@@ -94,22 +99,27 @@ func TestFeatureUnmarshal(t *testing.T) {
 		// "Feature" is misspelled
 		{
 			Input:    []byte(`{"type":"Faeture","geometry":{"type":"Point","coordinates":[1,2]},"properties":null}`),
-			Instance: &Feature{Geometry: &Point{}},
+			Instance: &Feature{},
 		},
-		// Bad geometry Unmarshal
+		// Bad Geometry type
 		{
-			Input:    []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null}`),
-			Instance: &Feature{Geometry: badGeom{}},
+			Input:    []byte(`{"type":"Feature","geometry":{"type":"NoBueno","coordinates":[1,2]},"properties":null}`),
+			Instance: &Feature{},
+		},
+		// Bad Geometry JSON
+		{
+			Input:    []byte(`{"type":"Feature","geometry":"foo"}`),
+			Instance: &Feature{},
 		},
 		// Bad JSON for properties
 		{
 			Input:    []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":{[['','':}}`),
-			Instance: &Feature{Geometry: &Point{}},
+			Instance: &Feature{},
 		},
 	} {
 
 		if err := testcase.Instance.UnmarshalJSON(testcase.Input); err == nil {
-			t.Fatal("expected error, got nil")
+			t.Fatalf("expected error, got nil for %s", string(testcase.Input))
 		}
 	}
 }

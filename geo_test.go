@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"encoding/json"
 	"errors"
 	"testing"
 )
@@ -50,7 +51,7 @@ func (tests marshalTestcases) pass(t *testing.T) {
 
 // unmarshalTestcases is a helper type for UnmarshalJSON tests.
 type unmarshalTestcases []struct {
-	Input    string
+	Input    []byte
 	Expected Geometry
 	Instance Geometry
 }
@@ -58,7 +59,7 @@ type unmarshalTestcases []struct {
 // pass runs the test cases that should pass.
 func (tests unmarshalTestcases) pass(t *testing.T) {
 	for _, c := range tests {
-		if err := c.Instance.UnmarshalJSON([]byte(c.Input)); err != nil {
+		if err := json.Unmarshal(c.Input, c.Instance); err != nil {
 			t.Fatal(err)
 		}
 		if !c.Instance.Compare(c.Expected) {
@@ -70,7 +71,7 @@ func (tests unmarshalTestcases) pass(t *testing.T) {
 // fail runs the test cases that should fail.
 func (tests unmarshalTestcases) fail(t *testing.T) {
 	for _, c := range tests {
-		if err := c.Instance.UnmarshalJSON([]byte(c.Input)); err == nil {
+		if err := json.Unmarshal(c.Input, c.Instance); err == nil {
 			t.Fatal("expected error, got nil")
 		}
 	}
