@@ -336,6 +336,27 @@ func TestPolygonContains(t *testing.T) {
 				{2, -2},
 			},
 		},
+		// Horizontal ray intersects two vertices
+		{
+			Poly: Polygon{
+				{
+					{0, 0},
+					{0, 4},
+					{2, 4},
+					{3, 2},
+					{4, 4},
+					{6, 4},
+					{8, 2},
+					{6, 0},
+				},
+			},
+			Inside: []Point{
+				{1, 2},
+			},
+			Outside: []Point{
+				{-1, 2},
+			},
+		},
 	} {
 		if testcase.Inside != nil {
 			for _, point := range testcase.Inside {
