@@ -29,6 +29,11 @@ func (circle Circle) Compare(g Geometry) bool {
 	return c.Radius == circle.Radius
 }
 
+// Contains determines if the circle contains the point.
+func (circle Circle) Contains(p Point) bool {
+	return p.DistanceFrom(circle.Center) < circle.Radius
+}
+
 // MarshalJSON marshals a circle to GeoJSON.
 // See https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms
 func (circle Circle) MarshalJSON() ([]byte, error) {

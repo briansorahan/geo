@@ -147,6 +147,102 @@ func TestPolygonCompare(t *testing.T) {
 	}
 }
 
+func TestPolygonContains(t *testing.T) {
+	for _, testcase := range []struct {
+		Poly    Polygon
+		Inside  []Point
+		Outside []Point
+	}{
+		// Square
+		{
+			Poly: Polygon{
+				{
+					{0, 0},
+					{2, 0},
+					{2, 2},
+					{0, 2},
+					{0, 0},
+				},
+			},
+			Inside: []Point{
+				{1, 1},
+			},
+			Outside: []Point{
+				{4, 1},
+			},
+		},
+		// Hexagon
+		{
+			Poly: Polygon{
+				{
+					{0, 1},
+					{1, 2},
+					{2, 1},
+					{2, 0},
+					{1, -1},
+					{0, 0},
+					{0, 1},
+				},
+			},
+			Inside: []Point{
+				{1, 0},
+			},
+		},
+		// A tilted quadrilateral
+		{
+			Poly: Polygon{
+				{
+					{-1, 10},
+					{10, 1},
+					{1, -10},
+					{-10, -1},
+					{-1, 10},
+				},
+			},
+			Inside: []Point{
+				{2, 2},
+				{2, -2},
+			},
+		},
+		// Horizontal ray intersects two vertices
+		{
+			Poly: Polygon{
+				{
+					{0, 0},
+					{0, 4},
+					{2, 4},
+					{3, 2},
+					{4, 4},
+					{6, 4},
+					{8, 2},
+					{6, 0},
+				},
+			},
+			Inside: []Point{
+				{1, 2},
+			},
+			Outside: []Point{
+				{-1, 2},
+			},
+		},
+	} {
+		if testcase.Inside != nil {
+			for _, point := range testcase.Inside {
+				if !testcase.Poly.Contains(point) {
+					t.Fatalf("Expected polygon %v to contain point %v", testcase.Poly, point)
+				}
+			}
+		}
+		if testcase.Outside != nil {
+			for _, point := range testcase.Outside {
+				if testcase.Poly.Contains(point) {
+					t.Fatalf("Expected polygon %v to not contain point %v", testcase.Poly, point)
+				}
+			}
+		}
+	}
+}
+
 func TestPolygonMarshal(t *testing.T) {
 	// Pass
 	marshalTestcases{
@@ -276,102 +372,6 @@ func TestPolygonEmpty(t *testing.T) {
 	}
 	if expected != got {
 		t.Fatalf("expected %s, got %s", expected, got)
-	}
-}
-
-func TestPolygonContains(t *testing.T) {
-	for _, testcase := range []struct {
-		Poly    Polygon
-		Inside  []Point
-		Outside []Point
-	}{
-		// Square
-		{
-			Poly: Polygon{
-				{
-					{0, 0},
-					{2, 0},
-					{2, 2},
-					{0, 2},
-					{0, 0},
-				},
-			},
-			Inside: []Point{
-				{1, 1},
-			},
-			Outside: []Point{
-				{4, 1},
-			},
-		},
-		// Hexagon
-		{
-			Poly: Polygon{
-				{
-					{0, 1},
-					{1, 2},
-					{2, 1},
-					{2, 0},
-					{1, -1},
-					{0, 0},
-					{0, 1},
-				},
-			},
-			Inside: []Point{
-				{1, 0},
-			},
-		},
-		// A tilted quadrilateral
-		{
-			Poly: Polygon{
-				{
-					{-1, 10},
-					{10, 1},
-					{1, -10},
-					{-10, -1},
-					{-1, 10},
-				},
-			},
-			Inside: []Point{
-				{2, 2},
-				{2, -2},
-			},
-		},
-		// Horizontal ray intersects two vertices
-		{
-			Poly: Polygon{
-				{
-					{0, 0},
-					{0, 4},
-					{2, 4},
-					{3, 2},
-					{4, 4},
-					{6, 4},
-					{8, 2},
-					{6, 0},
-				},
-			},
-			Inside: []Point{
-				{1, 2},
-			},
-			Outside: []Point{
-				{-1, 2},
-			},
-		},
-	} {
-		if testcase.Inside != nil {
-			for _, point := range testcase.Inside {
-				if !testcase.Poly.Contains(point) {
-					t.Fatalf("Expected polygon %v to contain point %v", testcase.Poly, point)
-				}
-			}
-		}
-		if testcase.Outside != nil {
-			for _, point := range testcase.Outside {
-				if testcase.Poly.Contains(point) {
-					t.Fatalf("Expected polygon %v to not contain point %v", testcase.Poly, point)
-				}
-			}
-		}
 	}
 }
 
