@@ -30,6 +30,11 @@ func (point Point) Compare(g Geometry) bool {
 	return true
 }
 
+// DistanceFrom computes the distance from one point to another.
+func (point Point) DistanceFrom(other Point) float64 {
+	return math.Sqrt(math.Pow(point[1]-other[1], 2) + math.Pow(point[0]-other[0], 2))
+}
+
 // MarshalJSON returns the GeoJSON representation of the point.
 func (point Point) MarshalJSON() ([]byte, error) {
 	s := pointJSONPrefix

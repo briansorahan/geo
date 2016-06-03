@@ -24,7 +24,7 @@ func TestPointCompare(t *testing.T) {
 	}.fail(t)
 }
 
-func TestPointMarshal(t *testing.T) {
+func TestPointMarshalJSON(t *testing.T) {
 	marshalTestcases{
 		{
 			Input:    &Point{1.2, 3.4},
