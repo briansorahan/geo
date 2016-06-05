@@ -50,6 +50,30 @@ func (tests marshalTestcases) pass(t *testing.T) {
 	}
 }
 
+// scanTestcases is a helper type for Scan tests.
+type scanTestcases []struct {
+	Input    interface{}
+	Instance Geometry
+}
+
+// fail runs test cases that should fail.
+func (tests scanTestcases) fail(t *testing.T) {
+	for _, testcase := range tests {
+		if err := testcase.Instance.Scan(testcase.Input); err == nil {
+			t.Fatalf("expected error, got nil")
+		}
+	}
+}
+
+// pass runs test cases that should pass.
+func (tests scanTestcases) pass(t *testing.T) {
+	for _, testcase := range tests {
+		if err := testcase.Instance.Scan(testcase.Input); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
 // unmarshalTestcases is a helper type for UnmarshalJSON tests.
 type unmarshalTestcases []struct {
 	Input    []byte

@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 )
@@ -14,6 +15,16 @@ var (
 type Feature struct {
 	Geometry   Geometry    `json:"geometry"`
 	Properties interface{} `json:"properties,omitempty"`
+}
+
+// Compare compares one feature to another.
+// Note that this method does not compare properties.
+func (f Feature) Compare(g Geometry) bool {
+	other, ok := g.(*Feature)
+	if !ok {
+		return false
+	}
+	return f.Geometry.Compare(other.Geometry)
 }
 
 // MarshalJSON marshals the feature to GeoJSON.
@@ -32,9 +43,21 @@ func (f Feature) MarshalJSON() ([]byte, error) {
 	return append(buf, '}'), nil
 }
 
+// Scan scans a feature from well known text.
+func (f *Feature) Scan(src interface{}) error {
+	return f.Geometry.Scan(src)
+}
+
+// String converts the feature to a WKT string.
+func (f Feature) String() string {
+	return f.Geometry.String()
+}
+
+// feature is a utility type used to unmarshal geojson Feature's.
 type feature struct {
-	Type     string          `json:"type"`
-	Geometry json.RawMessage `json:"geometry"`
+	Type       string          `json:"type"`
+	Geometry   json.RawMessage `json:"geometry"`
+	Properties interface{}     `json:"properties"`
 }
 
 // UnmarshalJSON unmarshals a feature from JSON.
@@ -54,6 +77,14 @@ func (f *Feature) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
+
 	f.Geometry = geom
+	f.Properties = feat.Properties
+
 	return nil
+}
+
+// Value returns well known text for the feature.
+func (f Feature) Value() (driver.Value, error) {
+	return f.Geometry.Value()
 }
