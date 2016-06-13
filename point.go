@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	pointWKT        = `POINT(%f %f)`
+	pointWKTPrefix  = `POINT`
+	pointWKT        = `(%f %f)`
 	pointJSONPrefix = `{"type":"Point","coordinates":[`
 )
 
@@ -28,6 +29,11 @@ func (point Point) Compare(g Geometry) bool {
 		return false
 	}
 	return true
+}
+
+// Contains is the exact same as Compare.
+func (point Point) Contains(other Point) bool {
+	return point.Compare(&other)
 }
 
 // DistanceFrom computes the distance from one point to another.
@@ -72,11 +78,11 @@ func (point Point) RayhIntersects(a, b Point) bool {
 func (point *Point) Scan(src interface{}) error {
 	switch v := src.(type) {
 	case []byte:
-		if _, err := fmt.Sscanf(string(v), pointWKT, &point[0], &point[1]); err != nil {
+		if _, err := fmt.Sscanf(string(v), pointWKTPrefix+pointWKT, &point[0], &point[1]); err != nil {
 			return err
 		}
 	case string:
-		if _, err := fmt.Sscanf(v, pointWKT, &point[0], &point[1]); err != nil {
+		if _, err := fmt.Sscanf(v, pointWKTPrefix+pointWKT, &point[0], &point[1]); err != nil {
 			return err
 		}
 	default:

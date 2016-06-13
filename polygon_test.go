@@ -2,90 +2,33 @@ package geo
 
 import "testing"
 
-func TestPolygonCompare(t *testing.T) {
-	// Same
-	for _, testcase := range []struct {
-		P1 Polygon
-		P2 *Polygon
-	}{
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
-			},
-			P2: &Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
+func TestPolygon(t *testing.T) {
+	// Compare
+	cases{
+		G: &Polygon{
+			{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{1.4, 9.3},
+				{-1.7, 7.3},
 			},
 		},
-	} {
-
-		if same := testcase.P1.Compare(testcase.P2); !same {
-			t.Fatalf("expected %s and %s to be the same", testcase.P1.String(), testcase.P2.String())
-		}
-	}
-	// Different
-	for _, testcase := range []struct {
-		P1 Polygon
-		P2 Geometry
-	}{
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
-			},
-			P2: &Polygon{
+		Different: []Geometry{
+			&Polygon{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
 					{1.4, 9.3},
 				},
 			},
-		},
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
+			&Polygon{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
 					{1.4, 9.3},
 				},
 			},
-			P2: &Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-				},
-			},
-		},
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
-			},
-			P2: &Polygon{
+			&Polygon{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -93,17 +36,7 @@ func TestPolygonCompare(t *testing.T) {
 					{-1.4, 7.3},
 				},
 			},
-		},
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
-			},
-			P2: &Polygon{
+			&Polygon{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -111,136 +44,92 @@ func TestPolygonCompare(t *testing.T) {
 					{-1.7, 7.5},
 				},
 			},
-		},
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
-			},
-			P2: &Line{
+			&Line{
 				{1.2, 3.4},
 				{5.6, 7.8},
 				{1.4, 9.3},
 				{-1.7, 7.5},
 			},
+			&Point{1.2, 3.4},
 		},
-		{
-			P1: Polygon{
-				{
-					{1.2, 3.4},
-					{5.6, 7.8},
-					{1.4, 9.3},
-					{-1.7, 7.3},
-				},
-			},
-			P2: &Point{1.2, 3.4},
-		},
-	} {
+	}.test(t)
 
-		if same := testcase.P1.Compare(testcase.P2); same {
-			t.Fatalf("expected %s to not equal %s", testcase.P1.String(), testcase.P2.String())
-		}
-	}
-}
-
-func TestPolygonContains(t *testing.T) {
-	for _, testcase := range []struct {
-		Poly    Polygon
-		Inside  []Point
-		Outside []Point
-	}{
+	// Contains (square)
+	cases{
 		// Square
-		{
-			Poly: Polygon{
-				{
-					{0, 0},
-					{2, 0},
-					{2, 2},
-					{0, 2},
-					{0, 0},
-				},
-			},
-			Inside: []Point{
-				{1, 1},
-			},
-			Outside: []Point{
-				{4, 1},
-			},
-		},
-		// Hexagon
-		{
-			Poly: Polygon{
-				{
-					{0, 1},
-					{1, 2},
-					{2, 1},
-					{2, 0},
-					{1, -1},
-					{0, 0},
-					{0, 1},
-				},
-			},
-			Inside: []Point{
-				{1, 0},
-			},
-		},
-		// A tilted quadrilateral
-		{
-			Poly: Polygon{
-				{
-					{-1, 10},
-					{10, 1},
-					{1, -10},
-					{-10, -1},
-					{-1, 10},
-				},
-			},
-			Inside: []Point{
+		G: &Polygon{
+			{
+				{0, 0},
+				{2, 0},
 				{2, 2},
-				{2, -2},
+				{0, 2},
+				{0, 0},
 			},
 		},
-		// Horizontal ray intersects two vertices
-		{
-			Poly: Polygon{
-				{
-					{0, 0},
-					{0, 4},
-					{2, 4},
-					{3, 2},
-					{4, 4},
-					{6, 4},
-					{8, 2},
-					{6, 0},
-				},
-			},
-			Inside: []Point{
+		Inside: []Point{
+			{1, 1},
+		},
+		Outside: []Point{
+			{4, 1},
+		},
+	}.test(t)
+
+	// Contains (hexagon)
+	cases{
+		G: &Polygon{
+			{
+				{0, 1},
 				{1, 2},
-			},
-			Outside: []Point{
-				{-1, 2},
+				{2, 1},
+				{2, 0},
+				{1, -1},
+				{0, 0},
+				{0, 1},
 			},
 		},
-	} {
-		if testcase.Inside != nil {
-			for _, point := range testcase.Inside {
-				if !testcase.Poly.Contains(point) {
-					t.Fatalf("Expected polygon %v to contain point %v", testcase.Poly, point)
-				}
-			}
-		}
-		if testcase.Outside != nil {
-			for _, point := range testcase.Outside {
-				if testcase.Poly.Contains(point) {
-					t.Fatalf("Expected polygon %v to not contain point %v", testcase.Poly, point)
-				}
-			}
-		}
-	}
+		Inside: []Point{
+			{1, 0},
+		},
+	}.test(t)
+
+	// Contains (quadrilateral)
+	cases{
+		G: &Polygon{
+			{
+				{-1, 10},
+				{10, 1},
+				{1, -10},
+				{-10, -1},
+				{-1, 10},
+			},
+		},
+		Inside: []Point{
+			{2, 2},
+			{2, -2},
+		},
+	}.test(t)
+
+	// Contains (horizontal ray intersects two vertices)
+	cases{
+		G: &Polygon{
+			{
+				{0, 0},
+				{0, 4},
+				{2, 4},
+				{3, 2},
+				{4, 4},
+				{6, 4},
+				{8, 2},
+				{6, 0},
+			},
+		},
+		Inside: []Point{
+			{1, 2},
+		},
+		Outside: []Point{
+			{-1, 2},
+		},
+	}.test(t)
 }
 
 func TestPolygonMarshal(t *testing.T) {

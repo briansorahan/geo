@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 )
 
-const featureCollectionJSONPrefix = `{"type":"FeatureCollection","features":[`
+const (
+	featureCollectionJSONPrefix = `{"type":"FeatureCollection","features":[`
+	featureCollectionWKTPrefix  = `GEOMETRYCOLLECTION`
+)
 
 // FeatureCollection represents a feature collection.
 type FeatureCollection []Feature
@@ -21,6 +24,17 @@ func (coll FeatureCollection) Compare(g Geometry) bool {
 	}
 	for i, feat := range coll {
 		if !feat.Compare(&(*other)[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// Contains returns true if every feature in the collection
+// contains the p, and false otherwise.
+func (coll FeatureCollection) Contains(p Point) bool {
+	for _, feat := range coll {
+		if !feat.Contains(p) {
 			return false
 		}
 	}
@@ -45,25 +59,35 @@ func (coll FeatureCollection) MarshalJSON() ([]byte, error) {
 
 // Scan scans the feature collection from WKT.
 // This method expects a GEOMETRYCOLLECTION.
+// TODO: implement this.
 func (coll *FeatureCollection) Scan(src interface{}) error {
-	return nil
+	return scan(coll, src)
 }
 
 // scan scans the feature collection from WKT.
 // This method expects a GEOMETRYCOLLECTION.
+// TODO: implement this.
 func (coll *FeatureCollection) scan(s string) error {
 	return nil
 }
 
 // String converts the feature collection to a GEOMETRYCOLLECTION.
 func (coll FeatureCollection) String() string {
-	return ""
+	s := featureCollectionWKTPrefix + "("
+	for i, feat := range coll {
+		if i == 0 {
+			s += feat.Geometry.String()
+		} else {
+			s += ", " + feat.String()
+		}
+	}
+	return s + ")"
 }
 
-// featureCollection is a utility type used to unmarshal geojson FeatureCollection's.
+// featureCollection is a utility type used to unmarshal a geojson FeatureCollection.
 type featureCollection struct {
-	Type     string    `json:"type"`
-	Features []Feature `json:"features"`
+	Type     string     `json:"type"`
+	Features []*Feature `json:"features"`
 }
 
 // UnmarshalJSON unmarshals the feature collection from geojson.
@@ -74,7 +98,7 @@ func (coll *FeatureCollection) UnmarshalJSON(data []byte) error {
 	}
 	*coll = make([]Feature, len(fc.Features))
 	for i, feat := range fc.Features {
-		(*coll)[i] = feat
+		(*coll)[i] = *feat
 	}
 	return nil
 }

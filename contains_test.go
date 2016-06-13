@@ -21,7 +21,7 @@ func BenchmarkGeosPaulSmit(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	point, err := geos.NewPoint(geos.Coord{1, 0, 0})
+	point, err := geos.NewPoint(geos.Coord{X: 1, Y: 0, Z: 0})
 	if err != nil {
 		b.Fatal(err)
 	}

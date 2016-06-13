@@ -2,34 +2,47 @@ package geo
 
 import "testing"
 
-func TestFeatureCollectionCompare(t *testing.T) {
-	// Fail
-	compareTestcases{
-		{
-			G1: &FeatureCollection{},
-			G2: &Point{},
-		},
-		{
-			G1: &FeatureCollection{
-				Feature{
-					Geometry: &Point{1, 1},
-				},
+func TestFeatureCollection(t *testing.T) {
+	// Compare
+	cases{
+		G: &FeatureCollection{
+			Feature{
+				Geometry: &Point{1, 1},
 			},
-			G2: &FeatureCollection{},
 		},
-		{
-			G1: &FeatureCollection{
-				Feature{
-					Geometry: &Point{1, 1},
-				},
-			},
-			G2: &FeatureCollection{
+		Different: []Geometry{
+			&FeatureCollection{},
+			&FeatureCollection{
 				Feature{
 					Geometry: &Line{{0, 0}, {1, 1}},
 				},
 			},
+			&Point{0, 0},
 		},
-	}.fail(t)
+	}.test(t)
+
+	// Contains
+	cases{
+		G: &FeatureCollection{
+			Feature{
+				Geometry: &Polygon{
+					{
+						{0, 0},
+						{2, 0},
+						{2, 2},
+						{0, 2},
+						{0, 0},
+					},
+				},
+			},
+		},
+		Inside: []Point{
+			{1, 1},
+		},
+		Outside: []Point{
+			{12, 12},
+		},
+	}.test(t)
 }
 
 func TestFeatureCollectionMarshal(t *testing.T) {
@@ -96,7 +109,12 @@ func TestFeatureCollectionMarshal(t *testing.T) {
 }
 
 func TestFeatureCollectionScan(t *testing.T) {
-	// TODO
+	scanTestcases{
+		{
+			Input:    `GEOMETRYCOLLECTION(POINT(0 0), LINESTRING(0 0, 1 1))`,
+			Instance: &FeatureCollection{},
+		},
+	}.pass(t)
 }
 
 func TestFeatureCollectionUnmarshal(t *testing.T) {
@@ -120,8 +138,30 @@ func TestFeatureCollectionUnmarshal(t *testing.T) {
 			Instance: &FeatureCollection{},
 		},
 	}.pass(t)
+
+	// Fail
+	// TODO: why does this not actually call UnmarshalJSON on the feature collection?
+	unmarshalTestcases{
+		{
+			Input:    []byte(`$#$//&(*$/&#`),
+			Instance: &FeatureCollection{},
+		},
+	}.fail(t)
 }
 
 func TestFeatureCollectionValue(t *testing.T) {
-	// TODO
+	// Pass
+	valueTestcases{
+		{
+			Input: &FeatureCollection{
+				Feature{
+					Geometry: &Point{0, 0},
+				},
+				Feature{
+					Geometry: &Line{{-1, 1}, {1, -1}},
+				},
+			},
+			Expected: `GEOMETRYCOLLECTION(POINT(0 0), LINESTRING(-1 1, 1 -1))`,
+		},
+	}.pass(t)
 }

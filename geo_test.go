@@ -7,26 +7,38 @@ import (
 	"testing"
 )
 
-// compareTestcases is a helper type for Compare tests.
-type compareTestcases []struct {
-	G1 Geometry
-	G2 Geometry
+type cases struct {
+	G Geometry
+
+	// Compare tests.
+	Same      []Geometry
+	Different []Geometry
+
+	// Contains tests.
+	Inside  []Point
+	Outside []Point
 }
 
 // pass runs the test cases that should pass.
-func (tests compareTestcases) pass(t *testing.T) {
-	for _, c := range tests {
-		if same := c.G1.Compare(c.G2); !same {
-			t.Fatalf("expected %s and %s to be the same", c.G1.String(), c.G2.String())
+func (c cases) test(t *testing.T) {
+	for i, same := range c.Same {
+		if ok := c.G.Compare(same); !ok {
+			t.Fatalf("(case %d) expected %s and %s to be the same", i, c.G.String(), same.String())
 		}
 	}
-}
-
-// fail runs the test cases that should fail.
-func (tests compareTestcases) fail(t *testing.T) {
-	for _, c := range tests {
-		if same := c.G1.Compare(c.G2); same {
-			t.Fatalf("expected %s to not equal %s", c.G1.String(), c.G2.String())
+	for i, diff := range c.Different {
+		if ok := c.G.Compare(diff); ok {
+			t.Fatalf("(case %d) expected %s to not equal %s", i, c.G.String(), diff.String())
+		}
+	}
+	for i, p := range c.Inside {
+		if ok := c.G.Contains(p); !ok {
+			t.Fatalf("(case %d) expected %s to contain %s", i, c.G.String(), p.String())
+		}
+	}
+	for i, p := range c.Outside {
+		if ok := c.G.Contains(p); ok {
+			t.Fatalf("(case %d) expected %s to not contain %s", i, c.G.String(), p.String())
 		}
 	}
 }
@@ -39,13 +51,13 @@ type marshalTestcases []struct {
 
 // pass runs the test cases that should pass.
 func (tests marshalTestcases) pass(t *testing.T) {
-	for _, testcase := range tests {
+	for i, testcase := range tests {
 		got, err := testcase.Input.MarshalJSON()
 		if err != nil {
 			t.Fatal(err)
 		}
 		if string(got) != testcase.Expected {
-			t.Fatalf("expected %s, got %s", testcase.Expected, string(got))
+			t.Fatalf("(case %d) expected %s, got %s", i, testcase.Expected, string(got))
 		}
 	}
 }
@@ -58,18 +70,18 @@ type scanTestcases []struct {
 
 // fail runs test cases that should fail.
 func (tests scanTestcases) fail(t *testing.T) {
-	for _, testcase := range tests {
-		if err := testcase.Instance.Scan(testcase.Input); err == nil {
-			t.Fatalf("expected error, got nil")
+	for i, c := range tests {
+		if err := c.Instance.Scan(c.Input); err == nil {
+			t.Fatalf("(case %d) expected error, got nil", i)
 		}
 	}
 }
 
 // pass runs test cases that should pass.
 func (tests scanTestcases) pass(t *testing.T) {
-	for _, testcase := range tests {
-		if err := testcase.Instance.Scan(testcase.Input); err != nil {
-			t.Fatal(err)
+	for i, c := range tests {
+		if err := c.Instance.Scan(c.Input); err != nil {
+			t.Fatalf("(case %d) failed to scan: %s", i, err)
 		}
 	}
 }
@@ -83,21 +95,40 @@ type unmarshalTestcases []struct {
 
 // pass runs the test cases that should pass.
 func (tests unmarshalTestcases) pass(t *testing.T) {
-	for _, c := range tests {
+	for i, c := range tests {
 		if err := json.Unmarshal(c.Input, c.Instance); err != nil {
 			t.Fatal(err)
 		}
 		if !c.Instance.Compare(c.Expected) {
-			t.Fatalf("expected %s to equal %s", c.Instance.String(), c.Expected.String())
+			t.Fatalf("(case %d) expected %s to equal %s", i, c.Instance.String(), c.Expected.String())
 		}
 	}
 }
 
 // fail runs the test cases that should fail.
 func (tests unmarshalTestcases) fail(t *testing.T) {
-	for _, c := range tests {
+	for i, c := range tests {
 		if err := json.Unmarshal(c.Input, c.Instance); err == nil {
-			t.Fatal("expected error, got nil")
+			t.Fatalf("(case %d) expected error, got nil", i)
+		}
+	}
+}
+
+// valueTestcases is a helper type for MarshalJSON tests.
+type valueTestcases []struct {
+	Input    Geometry
+	Expected interface{}
+}
+
+// pass runs the test cases that should pass.
+func (tests valueTestcases) pass(t *testing.T) {
+	for i, testcase := range tests {
+		got, err := testcase.Input.Value()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got != testcase.Expected {
+			t.Fatalf("(case %d) expected %v, got %v", i, testcase.Expected, got)
 		}
 	}
 }
@@ -107,6 +138,11 @@ type badGeom struct{}
 
 // Compare always returns false
 func (badgeom badGeom) Compare(g Geometry) bool {
+	return false
+}
+
+// Contains always returns false.
+func (badgeom badGeom) Contains(p Point) bool {
 	return false
 }
 

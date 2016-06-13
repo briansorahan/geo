@@ -24,6 +24,19 @@ func (line Line) Compare(g Geometry) bool {
 	return pointsCompare(line, *ls)
 }
 
+// Contains determines if the line contains a point.
+func (line Line) Contains(p Point) bool {
+	if len(line) < 2 {
+		return false
+	}
+	for i := range line {
+		if i == 0 {
+			continue
+		}
+	}
+	return false
+}
+
 // MarshalJSON marshals the line to JSON.
 func (line Line) MarshalJSON() ([]byte, error) {
 	return pointsMarshalJSON(line, lineJSONPrefix, lineJSONSuffix), nil

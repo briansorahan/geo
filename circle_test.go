@@ -4,28 +4,16 @@ import "testing"
 
 func TestCircleCompare(t *testing.T) {
 	// Different
-	compareTestcases{
-		{
-			G1: &Circle{Radius: 1, Center: Point{0, 0}},
-			G2: &Circle{Radius: 1, Center: Point{0, 2}},
+	cases{
+		G: &Circle{Radius: 1, Center: Point{0, 0}},
+		Different: []Geometry{
+			&Circle{Radius: 1, Center: Point{0, 2}},
+			&Circle{Radius: 3, Center: Point{0, 0}},
+			&Point{1, 1},
+			&Line{{0, 0}, {1, 1}},
+			&Polygon{{{0, 0}, {1, 0}, {1, 1}, {0, 1}, {0, 0}}},
 		},
-		{
-			G1: &Circle{Radius: 1, Center: Point{0, 0}},
-			G2: &Circle{Radius: 3, Center: Point{0, 0}},
-		},
-		{
-			G1: &Circle{Radius: 1, Center: Point{0, 0}},
-			G2: &Point{1, 1},
-		},
-		{
-			G1: &Circle{Radius: 1, Center: Point{0, 0}},
-			G2: &Line{{0, 0}, {1, 1}},
-		},
-		{
-			G1: &Circle{Radius: 1, Center: Point{0, 0}},
-			G2: &Polygon{{{0, 0}, {1, 0}, {1, 1}, {0, 1}, {0, 0}}},
-		},
-	}.fail(t)
+	}.test(t)
 }
 
 func TestCircleContains(t *testing.T) {

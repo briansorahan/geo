@@ -101,11 +101,6 @@ func (polygon *Polygon) scan(s string) error {
 	return nil
 }
 
-// Value converts a point to Well Known Text.
-func (polygon Polygon) Value() (driver.Value, error) {
-	return polygon.String(), nil
-}
-
 // String converts the polygon to a string.
 func (polygon Polygon) String() string {
 	if len(polygon) == 0 {
@@ -120,4 +115,9 @@ func (polygon Polygon) String() string {
 		}
 	}
 	return s + polygonWKTSuffix
+}
+
+// Value converts a point to Well Known Text.
+func (polygon Polygon) Value() (driver.Value, error) {
+	return polygon.String(), nil
 }

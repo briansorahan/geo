@@ -5,52 +5,113 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // Geometry types.
 const (
-	PointType   = "Point"
-	LineType    = "LineString"
-	PolygonType = "Polygon"
+	CircleType            = "Circle"
+	FeatureCollectionType = "FeatureCollection"
+	FeatureType           = "Feature"
+	LineType              = "LineString"
+	PointType             = "Point"
+	PolygonType           = "Polygon"
 )
 
 // Geometry defines the interface of every geometry type.
 type Geometry interface {
-	driver.Valuer
 	json.Marshaler
 	sql.Scanner
+	driver.Valuer
+
 	Compare(g Geometry) bool
+	Contains(p Point) bool
 	String() string
+}
+
+// ScanGeometry scans a geometry from well known text.
+func ScanGeometry(s string) (Geometry, error) {
+	if i := strings.Index(s, pointWKTPrefix); i == 0 {
+		pt := &Point{}
+		if err := pt.Scan(s); err != nil {
+			return nil, err
+		}
+		return pt, nil
+	}
+	if i := strings.Index(s, lineWKTPrefix); i == 0 {
+		l := &Line{}
+		if err := l.Scan(s); err != nil {
+			return nil, err
+		}
+		return l, nil
+	}
+	if i := strings.Index(s, polygonWKTPrefix); i == 0 {
+		p := &Polygon{}
+		if err := p.Scan(s); err != nil {
+			return nil, err
+		}
+		return p, nil
+	}
+	if i := strings.Index(s, circleWKTPrefix); i == 0 {
+		c := &Circle{}
+		if err := c.Scan(s); err != nil {
+			return nil, err
+		}
+		return c, nil
+	}
+	return nil, fmt.Errorf("unrecognized geometry: %s", s)
+}
+
+// UnmarshalGeometry unmarshals a geometry from geojson data.
+func UnmarshalGeometry(data []byte) (Geometry, error) {
+	g := &geometry{}
+	if err := json.Unmarshal(data, g); err != nil {
+		return nil, err
+	}
+	return g.unmarshalCoordinates()
 }
 
 // geometry is a utility type used to unmarshal geometries from JSON.
 type geometry struct {
 	Type        string          `json:"type"`
 	Coordinates json.RawMessage `json:"coordinates"`
+	Radius      float64         `json:"radius"` // For circles!
 }
 
 // Geometry returns a Geometry, or an error if Type is invalid.
-func (g geometry) Geometry() (Geometry, error) {
+func (g geometry) unmarshalCoordinates() (Geometry, error) {
 	switch g.Type {
 	default:
 		return nil, fmt.Errorf("unrecognized geometry type: %s", g.Type)
 	case PointType:
-		p := &Point{}
-		if err := json.Unmarshal(g.Coordinates, p); err != nil {
+		pt := [2]float64{}
+		if err := json.Unmarshal(g.Coordinates, &pt); err != nil {
 			return nil, err
 		}
-		return p, nil
+		p := Point(pt)
+		return &p, nil
 	case LineType:
-		l := &Line{}
-		if err := json.Unmarshal(g.Coordinates, l); err != nil {
+		ln := [][2]float64{}
+		if err := json.Unmarshal(g.Coordinates, &ln); err != nil {
 			return nil, err
 		}
-		return l, nil
+		l := Line(ln)
+		return &l, nil
 	case PolygonType:
-		p := &Polygon{}
-		if err := json.Unmarshal(g.Coordinates, p); err != nil {
+		poly := [][][2]float64{}
+		if err := json.Unmarshal(g.Coordinates, &poly); err != nil {
 			return nil, err
 		}
-		return p, nil
+		p := Polygon(poly)
+		return &p, nil
+	case CircleType:
+		center := [2]float64{}
+		if err := json.Unmarshal(g.Coordinates, &center); err != nil {
+			return nil, err
+		}
+		return &Circle{
+			Center: center,
+			Radius: g.Radius,
+		}, nil
 	}
 }

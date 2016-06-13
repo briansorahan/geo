@@ -4,24 +4,15 @@ import "testing"
 
 func TestPointCompare(t *testing.T) {
 	// Different
-	compareTestcases{
-		{
-			G1: &Point{1.2, 3.4},
-			G2: &Point{1.2, 3.7},
+	cases{
+		G: &Point{1.2, 3.4},
+		Different: []Geometry{
+			&Point{1.2, 3.7},
+			&Point{9.2, 3.7},
+			&Line{{9.2, 3.7}},
+			&Polygon{{{9.2, 3.7}}},
 		},
-		{
-			G1: &Point{1.2, 3.4},
-			G2: &Point{9.2, 3.7},
-		},
-		{
-			G1: &Point{1.2, 3.4},
-			G2: &Line{{9.2, 3.7}},
-		},
-		{
-			G1: &Point{1.2, 3.4},
-			G2: &Polygon{{{9.2, 3.7}}},
-		},
-	}.fail(t)
+	}.test(t)
 }
 
 func TestPointMarshalJSON(t *testing.T) {
