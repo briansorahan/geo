@@ -40,11 +40,15 @@ func pointsMarshalJSON(points [][2]float64, prefix, suffix string) []byte {
 // pointsScan scans a list of points from Well Known Text.
 // The points should look like (X0 Y0,X1 Y1,X2 Y2)
 func pointsScan(s string) ([][2]float64, error) {
-	if s[0] != '(' || s[len(s)-1] != ')' {
-		return nil, fmt.Errorf("could not scan points from %s", s)
+	if s[0] == 40 {
+		s = s[1 : len(s)-1]
 	}
+	if len(s)-2 >= 0 && s[len(s)-1] == 41 {
+		s = s[:len(s)-2]
+	}
+
 	points := [][2]float64{}
-	for _, coords := range strings.Split(s[1:len(s)-1], ",") {
+	for _, coords := range strings.Split(s, ",") {
 		var (
 			pair = [2]float64{}
 			xy   = strings.Split(strings.TrimSpace(coords), " ")
