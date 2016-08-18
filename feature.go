@@ -78,16 +78,20 @@ type feature struct {
 // UnmarshalJSON unmarshals a feature from JSON.
 func (f *Feature) UnmarshalJSON(data []byte) error {
 	feat := feature{}
+
 	if err := json.Unmarshal(data, &feat); err != nil {
 		return err
 	}
 	if feat.Type != FeatureType {
 		return fmt.Errorf("could not unmarshal feature from %s", string(data))
 	}
+
 	g := geometry{}
+
 	if err := json.Unmarshal(feat.Geometry, &g); err != nil {
 		return err
 	}
+
 	// Unmarshal the coordinates into one of our Geometry types.
 	geom, err := g.unmarshalCoordinates()
 	if err != nil {

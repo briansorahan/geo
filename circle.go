@@ -13,7 +13,7 @@ const (
 
 // Circle is a circle in the XY plane.
 type Circle struct {
-	Center Point   `json:"center"`
+	Center Point   `json:"coordinates"`
 	Radius float64 `json:"radius"`
 }
 
