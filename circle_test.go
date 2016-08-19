@@ -5,10 +5,10 @@ import "testing"
 func TestCircleCompare(t *testing.T) {
 	// Different
 	cases{
-		G: &Circle{Radius: 1, Center: Point{0, 0}},
+		G: &Circle{Radius: 1, Coordinates: Point{0, 0}},
 		Different: []Geometry{
-			&Circle{Radius: 1, Center: Point{0, 2}},
-			&Circle{Radius: 3, Center: Point{0, 0}},
+			&Circle{Radius: 1, Coordinates: Point{0, 2}},
+			&Circle{Radius: 3, Coordinates: Point{0, 0}},
 			&Point{1, 1},
 			&Line{{0, 0}, {1, 1}},
 			&Polygon{{{0, 0}, {1, 0}, {1, 1}, {0, 1}, {0, 0}}},
@@ -23,7 +23,7 @@ func TestCircleContains(t *testing.T) {
 		Outside []Point
 	}{
 		{
-			C: Circle{Radius: 2, Center: Point{0, 4}},
+			C: Circle{Radius: 2, Coordinates: Point{0, 4}},
 			Inside: []Point{
 				{1, 4},
 			},
@@ -52,7 +52,7 @@ func TestCircleContains(t *testing.T) {
 func TestCircleMarshalJSON(t *testing.T) {
 	marshalTestcases{
 		{
-			Input:    &Circle{Radius: 1.23, Center: Point{0, 0}},
+			Input:    &Circle{Radius: 1.23, Coordinates: Point{0, 0}},
 			Expected: `{"type":"Circle","radius":1.23,"coordinates":[0,0]}`,
 		},
 	}.pass(t)
@@ -66,7 +66,7 @@ func TestCircleScan(t *testing.T) {
 	}{
 		{
 			WKT:      "CIRCULARSTRING(1 0, 0 1, -1 0, 0 -1, 1 0)",
-			Expected: &Circle{Radius: 1, Center: Point{0, 0}},
+			Expected: &Circle{Radius: 1, Coordinates: Point{0, 0}},
 		},
 	} {
 		c := &Circle{}
@@ -94,7 +94,7 @@ func TestCircleScan(t *testing.T) {
 
 func TestCircleValue(t *testing.T) {
 	var (
-		c        = &Circle{Radius: 2, Center: Point{0, 4}}
+		c        = &Circle{Radius: 2, Coordinates: Point{0, 4}}
 		expected = `CIRCULARSTRING(2 4, 0 6, -2 4, 0 2, 2 4)`
 	)
 	value, err := c.Value()

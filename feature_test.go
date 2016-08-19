@@ -98,7 +98,7 @@ func TestFeatureScan(t *testing.T) {
 		{
 			Input: "CIRCULARSTRING(1 0, 0 1, -1 0, 0 -1, 1 0)",
 			Instance: &Feature{
-				Geometry: &Circle{Radius: 1, Center: Point{0, 0}},
+				Geometry: &Circle{Radius: 1, Coordinates: Point{0, 0}},
 			},
 		},
 	}.pass(t)
@@ -168,8 +168,8 @@ func TestFeatureUnmarshal(t *testing.T) {
 			Input: []byte(`{"type":"Feature","geometry":{"type":"Circle","coordinates":[3,2.5],"radius":1}}`),
 			Expected: Feature{
 				Geometry: &Circle{
-					Center: Point{3, 2.5},
-					Radius: 1,
+					Coordinates: Point{3, 2.5},
+					Radius:      1,
 				},
 			},
 			Instance: &Feature{},

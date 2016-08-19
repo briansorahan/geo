@@ -2,6 +2,7 @@ package geo
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -115,6 +116,28 @@ func (polygon Polygon) String() string {
 		}
 	}
 	return s + polygonWKTSuffix
+}
+
+// poly is used for unmarshalling geojson.
+type poly [][][2]float64
+
+// UnmarshalJSON unmarshals the polygon from GeoJSON.
+func (polygon *Polygon) UnmarshalJSON(data []byte) error {
+	g := &geometry{}
+
+	if err := json.Unmarshal(data, g); err != nil {
+		return err
+	}
+
+	p := &poly{}
+
+	if err := json.Unmarshal(g.Coordinates, p); err != nil {
+		return err
+	}
+
+	*polygon = Polygon(*p)
+
+	return nil
 }
 
 // Value converts a point to Well Known Text.

@@ -110,8 +110,8 @@ func (g geometry) unmarshalCoordinates() (Geometry, error) {
 			return nil, err
 		}
 		return &Circle{
-			Center: center,
-			Radius: g.Radius,
+			Coordinates: center,
+			Radius:      g.Radius,
 		}, nil
 	}
 }
