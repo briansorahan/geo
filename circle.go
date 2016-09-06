@@ -15,6 +15,13 @@ const (
 	circleWKTPrefix   = `CIRCULARSTRING`
 )
 
+var (
+	// CircleContainsMethod provides a way to control
+	// which algorithm is used to calculate if a point is
+	// inside a circle.
+	CircleContainsMethod = "equirectangular"
+)
+
 // Circle is a circle in the XY plane.
 type Circle struct {
 	Coordinates Point   `json:"coordinates"`
@@ -35,8 +42,26 @@ func (c Circle) Compare(g Geometry) bool {
 
 // Contains determines if the circle contains the point.
 // This assumes radius is specified in feet.
+// This method uses the package variable
+//     CircleContainsMethod
+// to choose a way to calculate if the point is in the circle.
+// See http://www.movable-type.co.uk/scripts/latlong.html for more info.
+// If CircleContainsMethod is not set to one of
+//     * "haversine"
+//     * "equirectangular"
+//     * "slc"
+// then this method panics.
 func (c Circle) Contains(p Point) bool {
-	return c.ContainsHaversine(p)
+	switch CircleContainsMethod {
+	case "haversine":
+		return c.ContainsHaversine(p)
+	case "slc":
+		return c.ContainsSLC(p)
+	case "equirectangular":
+		return c.ContainsEquirectangular(p)
+	default:
+		panic("Unrecognized CircleContainsMethod: " + CircleContainsMethod)
+	}
 }
 
 // ContainsHaversine uses the haversine formula to determine if the

@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"math"
 	"testing"
 
 	kdgeo "github.com/kellydunn/golang-geo"
@@ -150,6 +151,15 @@ func BenchmarkPolygonBrian(b *testing.B) {
 // 	}
 // }
 
+func hackyContains(p Circle, lng, lat float64) bool {
+	var (
+		dlng = (p.Coordinates[0] - lng) * float64(228200)
+		dlat = (p.Coordinates[1] - lat) * float64(364000)
+		d    = math.Sqrt(math.Pow(dlng, 2) + math.Pow(dlat, 2))
+	)
+	return d <= p.Radius
+}
+
 func BenchmarkCircleHaversine(b *testing.B) {
 	// Setup
 	circle := Circle{
@@ -199,6 +209,24 @@ func BenchmarkCircleEquirectangular(b *testing.B) {
 	// Test
 	for i := 0; i < b.N; i++ {
 		if contains := circle.ContainsEquirectangular(point); !contains {
+			b.Fatal("circle does not contain point")
+		}
+	}
+}
+
+func BenchmarkCircleHackyContains(b *testing.B) {
+	// Setup
+	circle := Circle{
+		Coordinates: [2]float64{-100, 22},
+		Radius:      1300,
+	}
+	point := Point{-100.00001, 22}
+
+	b.ResetTimer()
+
+	// Test
+	for i := 0; i < b.N; i++ {
+		if contains := hackyContains(circle, point[0], point[1]); !contains {
 			b.Fatal("circle does not contain point")
 		}
 	}
