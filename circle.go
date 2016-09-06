@@ -4,12 +4,15 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
 
 const (
-	circleWKTPrefix = `CIRCULARSTRING`
+	earthRadiusMeters = 6371e3 // earth's radius in meters
+	feetToMeters      = 0.3048 // convert feet to meters
+	circleWKTPrefix   = `CIRCULARSTRING`
 )
 
 // Circle is a circle in the XY plane.
@@ -31,8 +34,56 @@ func (c Circle) Compare(g Geometry) bool {
 }
 
 // Contains determines if the circle contains the point.
+// This assumes radius is specified in feet.
 func (c Circle) Contains(p Point) bool {
-	return p.DistanceFrom(c.Coordinates) < c.Radius
+	return c.ContainsHaversine(p)
+}
+
+// ContainsHaversine uses the haversine formula to determine if the
+// point is contained in the circle.
+func (c Circle) ContainsHaversine(p Point) bool {
+	var (
+		lat1 = toRadians(c.Coordinates[1])
+		lat2 = toRadians(p[1])
+		dLat = toRadians(p[1] - c.Coordinates[1])
+		dLng = toRadians(p[0] - c.Coordinates[0])
+		a    = (math.Sin(dLat/2) * math.Sin(dLat/2)) +
+			(math.Cos(lat1) * math.Cos(lat2) * math.Sin(dLng/2) * math.Sin(dLng/2))
+		d = earthRadiusMeters * 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	)
+	return d < (feetToMeters * c.Radius)
+}
+
+// ContainsSLC uses the spherical law of cosines to determine if
+// the point is contained in the circle.
+func (c Circle) ContainsSLC(p Point) bool {
+	var (
+		lat1 = toRadians(c.Coordinates[1])
+		lat2 = toRadians(p[1])
+		dLng = toRadians(p[0] - c.Coordinates[0])
+		a    = (math.Sin(lat1) * math.Sin(lat2)) +
+			(math.Cos(lat1) * math.Cos(lat2) * math.Cos(dLng))
+		d = earthRadiusMeters * math.Acos(a)
+	)
+	return d < (feetToMeters * c.Radius)
+}
+
+// ContainsEquirectangular uses equirectangular projection to
+// determine if the point is contained in the circle.
+func (c Circle) ContainsEquirectangular(p Point) bool {
+	var (
+		dLng = toRadians(p[0] - c.Coordinates[0])
+		mLat = toRadians(p[1]+c.Coordinates[1]) / float64(2)
+		y    = toRadians(p[1] - c.Coordinates[1])
+		x    = dLng * math.Cos(mLat)
+		d    = earthRadiusMeters * math.Sqrt((x*x)+(y*y))
+	)
+	return d < (feetToMeters * c.Radius)
+}
+
+// toRadians converts from degrees to radians.
+func toRadians(degrees float64) float64 {
+	return (math.Pi * degrees) / 180
 }
 
 // MarshalJSON marshals a circle to GeoJSON.

@@ -7,7 +7,7 @@ import (
 	"github.com/paulsmith/gogeos/geos"
 )
 
-func BenchmarkGeosPaulSmit(b *testing.B) {
+func BenchmarkPolygonGeosPaulSmit(b *testing.B) {
 	// Setup
 	polygon, err := geos.NewPolygon([]geos.Coord{
 		{0, 1, 0},
@@ -40,7 +40,7 @@ func BenchmarkGeosPaulSmit(b *testing.B) {
 	}
 }
 
-func BenchmarkGeoKellyDunn(b *testing.B) {
+func BenchmarkPolygonGeoKellyDunn(b *testing.B) {
 	// Setup
 	polygon := kdgeo.NewPolygon([]*kdgeo.Point{
 		kdgeo.NewPoint(0, 1),
@@ -78,7 +78,7 @@ func BenchmarkGeoKellyDunn(b *testing.B) {
 //     AUTHORITY["EPSG","4326"]]
 // `
 
-// func BenchmarkSorahanGdal(b *testing.B) {
+// func BenchmarkPolygonSorahanGdal(b *testing.B) {
 // 	// Setup
 // 	sref := gdal.CreateSpatialReference(WGS84)
 // 	polygon, err := gdal.CreateFromWKT("POLYGON(0 1, 1 2, 2 1, 2 0, 1 -1, 0 0, 0 1)", sref)
@@ -100,7 +100,7 @@ func BenchmarkGeoKellyDunn(b *testing.B) {
 // 	}
 // }
 
-func BenchmarkBrian(b *testing.B) {
+func BenchmarkPolygonBrian(b *testing.B) {
 	// Setup
 	polygon := Polygon([][][2]float64{
 		{
@@ -125,7 +125,7 @@ func BenchmarkBrian(b *testing.B) {
 	}
 }
 
-// func BenchmarkYan(b *testing.B) {
+// func BenchmarkPolygonYan(b *testing.B) {
 // 	// Setup
 // 	polygon := Coordinates{
 // 		{
@@ -149,3 +149,57 @@ func BenchmarkBrian(b *testing.B) {
 // 		}
 // 	}
 // }
+
+func BenchmarkCircleHaversine(b *testing.B) {
+	// Setup
+	circle := Circle{
+		Coordinates: [2]float64{-100, 22},
+		Radius:      1300,
+	}
+	point := Point{-100.00001, 22}
+
+	b.ResetTimer()
+
+	// Test
+	for i := 0; i < b.N; i++ {
+		if contains := circle.ContainsHaversine(point); !contains {
+			b.Fatal("circle does not contain point")
+		}
+	}
+}
+
+func BenchmarkCircleSLC(b *testing.B) {
+	// Setup
+	circle := Circle{
+		Coordinates: [2]float64{-100, 22},
+		Radius:      1300,
+	}
+	point := Point{-100.00001, 22}
+
+	b.ResetTimer()
+
+	// Test
+	for i := 0; i < b.N; i++ {
+		if contains := circle.ContainsSLC(point); !contains {
+			b.Fatal("circle does not contain point")
+		}
+	}
+}
+
+func BenchmarkCircleEquirectangular(b *testing.B) {
+	// Setup
+	circle := Circle{
+		Coordinates: [2]float64{-100, 22},
+		Radius:      1300,
+	}
+	point := Point{-100.00001, 22}
+
+	b.ResetTimer()
+
+	// Test
+	for i := 0; i < b.N; i++ {
+		if contains := circle.ContainsEquirectangular(point); !contains {
+			b.Fatal("circle does not contain point")
+		}
+	}
+}
