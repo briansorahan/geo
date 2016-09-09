@@ -26,3 +26,5 @@ _testmain.go
 # coverage
 cover.out
 cover.html
+
+distance-accuracy/distance-accuracy
