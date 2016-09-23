@@ -6,7 +6,6 @@ import (
 )
 
 func TestLineCompare(t *testing.T) {
-	// Pass
 	cases{
 		G: &Line{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.3}},
 		Same: []Geometry{
@@ -18,6 +17,22 @@ func TestLineCompare(t *testing.T) {
 			&Line{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.5}},
 			&Polygon{{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.5}}},
 			&Point{1.2, 3.4},
+		},
+	}.test(t)
+}
+
+func TestLineContains(t *testing.T) {
+	cases{
+		G: &Line{{0, 0}, {4, 4}},
+		Inside: []Point{
+			Point{0, 0},
+			Point{2, 2},
+			Point{4, 4},
+		},
+		Outside: []Point{
+			Point{-1, 0},
+			Point{1, 3},
+			Point{4, 5},
 		},
 	}.test(t)
 }

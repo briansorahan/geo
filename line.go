@@ -29,12 +29,37 @@ func (line Line) Contains(p Point) bool {
 	if len(line) < 2 {
 		return false
 	}
-	for i := range line {
+	for i, vertex := range line {
+		if vertex[0] == p[0] && vertex[1] == p[1] {
+			return true
+		}
 		if i == 0 {
 			continue
 		}
+		if segmentContains(vertex, line[i-1], p) {
+			return true
+		}
 	}
 	return false
+}
+
+// segmentContains returns true if p lies on the line segment
+// that connects s1 and s2.
+func segmentContains(s1, s2, p [2]float64) bool {
+	// Return false if p is outside of the bounding box around s1 and s2.
+	if (p[0] > s1[0] && p[0] > s2[0]) || (p[0] < s1[0] && p[0] < s2[0]) {
+		return false
+	}
+	if (p[1] > s1[1] && p[1] > s2[1]) || (p[1] < s1[1] && p[1] < s2[1]) {
+		return false
+	}
+	// Compare the slope of the segment between s1 and p
+	// to the slope of the segment between s1 and s2.
+	var (
+		segmentSlope = (s2[1] - s1[1]) / (s2[0] - s1[0])
+		pSlope       = (p[1] - s1[1]) / (p[0] - s1[0])
+	)
+	return segmentSlope == pSlope
 }
 
 // MarshalJSON marshals the line to JSON.

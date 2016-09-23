@@ -17,36 +17,15 @@ func TestCircleCompare(t *testing.T) {
 }
 
 func TestCircleContains(t *testing.T) {
-	for _, testcase := range []struct {
-		C       Circle
-		Inside  []Point
-		Outside []Point
-	}{
-		{
-			C: Circle{Radius: 100000, Coordinates: Point{0, 4}},
-			Inside: []Point{
-				{0.0001, 4},
-			},
-			Outside: []Point{
-				{4, 4},
-			},
+	cases{
+		G: &Circle{Radius: 100000, Coordinates: Point{0, 4}},
+		Inside: []Point{
+			{0.0001, 4},
 		},
-	} {
-		if testcase.Inside != nil {
-			for _, point := range testcase.Inside {
-				if !testcase.C.Contains(point) {
-					t.Fatalf("Expected polygon %v to contain point %v", testcase.C, point)
-				}
-			}
-		}
-		if testcase.Outside != nil {
-			for _, point := range testcase.Outside {
-				if testcase.C.Contains(point) {
-					t.Fatalf("Expected polygon %v to not contain point %v", testcase.C, point)
-				}
-			}
-		}
-	}
+		Outside: []Point{
+			{4, 4},
+		},
+	}.test(t)
 }
 
 func TestCircleMarshalJSON(t *testing.T) {
