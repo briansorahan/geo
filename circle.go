@@ -17,9 +17,15 @@ const (
 
 var (
 	// CircleContainsMethod provides a way to control
-	// which algorithm is used to calculate if a point is
-	// inside a circle.
+	// which algorithm is used to calculate if a point is inside a circle.
 	CircleContainsMethod = "equirectangular"
+)
+
+// Contains methods.
+const (
+	ContainsMethodHaversine        = "haversine"
+	ContainsMethodSphericalCosines = "slc"
+	ContainsMethodEquirectangular  = "equirectangular"
 )
 
 // Circle is a circle in the XY plane.
@@ -53,11 +59,11 @@ func (c Circle) Compare(g Geometry) bool {
 // then this method panics.
 func (c Circle) Contains(p Point) bool {
 	switch CircleContainsMethod {
-	case "haversine":
+	case ContainsMethodHaversine:
 		return c.ContainsHaversine(p)
-	case "slc":
+	case ContainsMethodSphericalCosines:
 		return c.ContainsSLC(p)
-	case "equirectangular":
+	case ContainsMethodEquirectangular:
 		return c.ContainsEquirectangular(p)
 	default:
 		panic("Unrecognized CircleContainsMethod: " + CircleContainsMethod)

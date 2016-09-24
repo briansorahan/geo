@@ -17,6 +17,8 @@ func TestCircleCompare(t *testing.T) {
 }
 
 func TestCircleContains(t *testing.T) {
+	// equirectangular
+	CircleContainsMethod = ContainsMethodEquirectangular
 	cases{
 		G: &Circle{Radius: 100000, Coordinates: Point{0, 4}},
 		Inside: []Point{
@@ -26,6 +28,45 @@ func TestCircleContains(t *testing.T) {
 			{4, 4},
 		},
 	}.test(t)
+
+	// spherical law of cosines
+	CircleContainsMethod = ContainsMethodSphericalCosines
+	cases{
+		G: &Circle{Radius: 100000, Coordinates: Point{0, 4}},
+		Inside: []Point{
+			{0.0001, 4},
+		},
+		Outside: []Point{
+			{4, 4},
+		},
+	}.test(t)
+
+	// haversine
+	CircleContainsMethod = ContainsMethodHaversine
+	cases{
+		G: &Circle{Radius: 100000, Coordinates: Point{0, 4}},
+		Inside: []Point{
+			{0.0001, 4},
+		},
+		Outside: []Point{
+			{4, 4},
+		},
+	}.test(t)
+}
+
+func TestCircleContainsPanic(t *testing.T) {
+	defer func() {
+		if val := recover(); val == nil {
+			t.Fatal("Circle Contains did not panic for unknown ContainsMethod")
+		}
+	}()
+
+	var (
+		c = &Circle{Radius: 100000, Coordinates: Point{0, 4}}
+		p = Point{0.0001, 4}
+	)
+	CircleContainsMethod = "foo"
+	c.Contains(p)
 }
 
 func TestCircleMarshalJSON(t *testing.T) {
@@ -69,6 +110,25 @@ func TestCircleScan(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 	}
+}
+
+func TestCircleUnmarshalJSON(t *testing.T) {
+	// Pass
+	unmarshalTestcases{
+		{
+			Instance: &Circle{},
+			Input:    []byte(`{"geometry":"Circle","coordinates":[2,2],"radius":1.8}`),
+			Expected: &Circle{Radius: 1.8, Coordinates: Point{2, 2}},
+		},
+	}.pass(t)
+
+	// Fail
+	unmarshalTestcases{
+		{
+			Instance: &Circle{},
+			Input:    []byte(`eometry":"Circle","coordinates":[2,2],"radiu1."8}`),
+		},
+	}.fail(t)
 }
 
 func TestCircleValue(t *testing.T) {
