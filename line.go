@@ -2,6 +2,7 @@ package geo
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 )
 
@@ -91,6 +92,25 @@ func (line Line) String() string {
 		return lineWKTEmpty
 	}
 	return lineWKTPrefix + pointsString(line)
+}
+
+// UnmarshalJSON unmarshals a line from GeoJSON.
+func (line *Line) UnmarshalJSON(data []byte) error {
+	g := geometry{}
+
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, &g)
+
+	if expected, got := LineType, g.Type; expected != got {
+		return fmt.Errorf("expected type %s, got %s", expected, got)
+	}
+
+	ln := [][2]float64{}
+	if err := json.Unmarshal(g.Coordinates, &ln); err != nil {
+		return err
+	}
+	*line = ln
+	return nil
 }
 
 // Value returns a driver Value.

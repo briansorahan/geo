@@ -3,6 +3,7 @@ package geo
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
 )
 
 const (
@@ -86,19 +87,26 @@ func (coll FeatureCollection) String() string {
 
 // featureCollection is a utility type used to unmarshal a geojson FeatureCollection.
 type featureCollection struct {
-	Type     string     `json:"type"`
-	Features []*Feature `json:"features"`
+	Type     string    `json:"type"`
+	Features []Feature `json:"features"`
 }
 
 // UnmarshalJSON unmarshals the feature collection from geojson.
 func (coll *FeatureCollection) UnmarshalJSON(data []byte) error {
 	fc := featureCollection{}
-	if err := json.Unmarshal(data, &fc); err != nil {
-		return err
+
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, &fc)
+
+	// Check the type.
+	if expected, got := FeatureCollectionType, fc.Type; expected != got {
+		return fmt.Errorf("expected %s type, got %s", expected, got)
 	}
+
 	*coll = make([]Feature, len(fc.Features))
+
 	for i, feat := range fc.Features {
-		(*coll)[i] = *feat
+		(*coll)[i] = feat
 	}
 	return nil
 }

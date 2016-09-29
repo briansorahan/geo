@@ -15,17 +15,17 @@ const (
 	circleWKTPrefix   = `CIRCULARSTRING`
 )
 
-var (
-	// CircleContainsMethod provides a way to control
-	// which algorithm is used to calculate if a point is inside a circle.
-	CircleContainsMethod = "equirectangular"
-)
-
 // Contains methods.
 const (
 	ContainsMethodHaversine        = "haversine"
 	ContainsMethodSphericalCosines = "slc"
 	ContainsMethodEquirectangular  = "equirectangular"
+)
+
+var (
+	// CircleContainsMethod provides a way to control
+	// which algorithm is used to calculate if a point is inside a circle.
+	CircleContainsMethod = ContainsMethodEquirectangular
 )
 
 // Circle is a circle in the XY plane.
@@ -172,16 +172,19 @@ func (c Circle) String() string {
 func (c *Circle) UnmarshalJSON(data []byte) error {
 	g := &geometry{}
 
-	if err := json.Unmarshal(data, g); err != nil {
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, g)
+
+	if expected, got := CircleType, g.Type; expected != got {
+		return fmt.Errorf("expected %s for type, got %s", expected, got)
+	}
+
+	coords := [2]float64{}
+	if err := json.Unmarshal(g.Coordinates, &coords); err != nil {
 		return err
 	}
 
-	// TODO: check type
-
-	if err := json.Unmarshal(g.Coordinates, &c.Coordinates); err != nil {
-		return err
-	}
-
+	c.Coordinates[0], c.Coordinates[1] = coords[0], coords[1]
 	c.Radius = g.Radius
 
 	return nil

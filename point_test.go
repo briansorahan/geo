@@ -26,38 +26,29 @@ func TestPointMarshalJSON(t *testing.T) {
 
 func TestPointScan(t *testing.T) {
 	// Good
-	for _, testcase := range []struct {
-		WKT      interface{}
-		Expected Point
-	}{
+	scanTestcases{
 		{
-			WKT:      "POINT(1.2 3.4)",
-			Expected: Point{1.2, 3.4},
+			Input:    `POINT(1.2 3.4)`,
+			Instance: &Point{},
+			Expected: &Point{1.2, 3.4},
 		},
-	} {
-		p := &Point{}
-		if err := p.Scan(testcase.WKT); err != nil {
-			t.Fatal(err)
-		}
-		if expected, got := testcase.Expected[0], p[0]; expected != got {
-			t.Fatalf("expected %f, got %f", expected, got)
-		}
-		if expected, got := testcase.Expected[1], p[1]; expected != got {
-			t.Fatalf("expected %f, got %f", expected, got)
-		}
-	}
+	}.pass(t)
 
 	// Bad
-	for _, testcase := range []interface{}{
-		"POINT(1.2, 3.4)",        // bad comma
-		[]byte("PIONT(1.4 2.3)"), // typo
-		7, // bad type
-	} {
-		p := &Point{}
-		if err := p.Scan(testcase); err == nil {
-			t.Fatal("expected error, got nil")
-		}
-	}
+	scanTestcases{
+		{
+			Input:    "POINT(1.2, 3.4)", // bad comma
+			Instance: &Point{},
+		},
+		{
+			Input:    []byte("PIONT(1.4 2.3)"), // typo
+			Instance: &Point{},
+		},
+		{
+			Input:    7, // bad type
+			Instance: &Point{},
+		},
+	}.fail(t)
 }
 
 func TestPointValue(t *testing.T) {

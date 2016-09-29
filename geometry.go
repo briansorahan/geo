@@ -21,6 +21,7 @@ const (
 // Geometry defines the interface of every geometry type.
 type Geometry interface {
 	json.Marshaler
+	json.Unmarshaler
 	sql.Scanner
 	driver.Valuer
 

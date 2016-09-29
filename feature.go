@@ -79,11 +79,12 @@ type feature struct {
 func (f *Feature) UnmarshalJSON(data []byte) error {
 	feat := feature{}
 
-	if err := json.Unmarshal(data, &feat); err != nil {
-		return err
-	}
-	if feat.Type != FeatureType {
-		return fmt.Errorf("could not unmarshal feature from %s", string(data))
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, &feat)
+
+	// Check the type.
+	if expected, got := FeatureType, feat.Type; expected != got {
+		return fmt.Errorf("expected type %s, got %s", expected, got)
 	}
 
 	g := geometry{}

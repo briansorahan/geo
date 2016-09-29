@@ -2,6 +2,7 @@ package geo
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"math"
 	"strconv"
@@ -97,6 +98,19 @@ func (point Point) String() string {
 	s += strconv.FormatFloat(point[0], 'f', -1, 64)
 	s += " " + strconv.FormatFloat(point[1], 'f', -1, 64) + ")"
 	return s
+}
+
+// UnmarshalJSON unmarshals a point from GeoJSON.
+func (point *Point) UnmarshalJSON(data []byte) error {
+	g := geometry{}
+
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, &g)
+
+	if expected, got := PointType, g.Type; expected != got {
+		return fmt.Errorf("expected %s type, got %s", expected, got)
+	}
+	return json.Unmarshal(g.Coordinates, point)
 }
 
 // Value converts a point to Well Known Text.

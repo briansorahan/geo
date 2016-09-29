@@ -66,6 +66,7 @@ func (tests marshalTestcases) pass(t *testing.T) {
 type scanTestcases []struct {
 	Input    interface{}
 	Instance Geometry
+	Expected Geometry
 }
 
 // fail runs test cases that should fail.
@@ -100,7 +101,7 @@ func (tests unmarshalTestcases) pass(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !c.Instance.Compare(c.Expected) {
-			t.Fatalf("(case %d) expected %s to equal %s", i, c.Instance.String(), c.Expected.String())
+			t.Fatalf("(unmarshal %T pass case %d) expected %s to equal %s", c.Instance, i, c.Instance.String(), c.Expected.String())
 		}
 	}
 }
@@ -109,7 +110,7 @@ func (tests unmarshalTestcases) pass(t *testing.T) {
 func (tests unmarshalTestcases) fail(t *testing.T) {
 	for i, c := range tests {
 		if err := json.Unmarshal(c.Input, c.Instance); err == nil {
-			t.Fatalf("(case %d) expected error, got nil", i)
+			t.Fatalf("(unmarshal %T fail case %d) expected error, got nil", c.Instance, i)
 		}
 	}
 }

@@ -1,6 +1,8 @@
 package geo
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCircleCompare(t *testing.T) {
 	// Different
@@ -117,7 +119,7 @@ func TestCircleUnmarshalJSON(t *testing.T) {
 	unmarshalTestcases{
 		{
 			Instance: &Circle{},
-			Input:    []byte(`{"geometry":"Circle","coordinates":[2,2],"radius":1.8}`),
+			Input:    []byte(`{"type":"Circle","coordinates":[2,2],"radius":1.8}`),
 			Expected: &Circle{Radius: 1.8, Coordinates: Point{2, 2}},
 		},
 	}.pass(t)
@@ -125,8 +127,19 @@ func TestCircleUnmarshalJSON(t *testing.T) {
 	// Fail
 	unmarshalTestcases{
 		{
+			// Bad JSON
 			Instance: &Circle{},
-			Input:    []byte(`eometry":"Circle","coordinates":[2,2],"radiu1."8}`),
+			Input:    []byte(`ype":"Circle","coordinates":[2,2],"radiu1."8}`),
+		},
+		{
+			// Bad type
+			Instance: &Circle{},
+			Input:    []byte(`{"type":"Circulo","coordinates":[2,2],"radius":1.8}`),
+		},
+		{
+			// Bad coordinates
+			Instance: &Circle{},
+			Input:    []byte(`{"type":"Circle","coordinates":[[2,2]],"radius":1.8}`),
 		},
 	}.fail(t)
 }

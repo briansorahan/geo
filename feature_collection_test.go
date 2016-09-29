@@ -140,10 +140,13 @@ func TestFeatureCollectionUnmarshal(t *testing.T) {
 	}.pass(t)
 
 	// Fail
-	// TODO: why does this not actually call UnmarshalJSON on the feature collection?
 	unmarshalTestcases{
 		{
 			Input:    []byte(`$#$//&(*$/&#`),
+			Instance: &FeatureCollection{},
+		},
+		{
+			Input:    []byte(`{"type":"FeatureColleccion","features":[]}`),
 			Instance: &FeatureCollection{},
 		},
 	}.fail(t)

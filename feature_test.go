@@ -207,6 +207,11 @@ func TestFeatureUnmarshal(t *testing.T) {
 			Input:    []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":{[['','':}}`),
 			Instance: &Feature{},
 		},
+		// Bad circle coordinates
+		{
+			Input:    []byte(`{"type":"Feature","geometry":{"type":"Circle","coordinates":"foo"}}`),
+			Instance: &Feature{},
+		},
 	} {
 
 		if err := testcase.Instance.UnmarshalJSON(testcase.Input); err == nil {

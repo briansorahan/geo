@@ -35,6 +35,11 @@ func TestLineContains(t *testing.T) {
 			Point{4, 5},
 		},
 	}.test(t)
+
+	cases{
+		G:       &Line{{4, 4}},
+		Outside: []Point{{-1, 0}},
+	}.test(t)
 }
 
 func TestLineMarshal(t *testing.T) {
@@ -108,6 +113,29 @@ func TestLineString(t *testing.T) {
 			t.Fatalf("expected %s, got %s", expected, got)
 		}
 	}
+}
+
+func TestLineUnmarshal(t *testing.T) {
+	unmarshalTestcases{
+		{
+			Input:    []byte(`{"type":"LineString","coordinates":[[0,0],[1,1]]}`),
+			Instance: &Line{},
+			Expected: &Line{{0, 0}, {1, 1}},
+		},
+	}.pass(t)
+
+	unmarshalTestcases{
+		{
+			// Bad type
+			Input:    []byte(`{"type":"Line","coordinates":[[0,0],[1,1]]}`),
+			Instance: &Line{},
+		},
+		{
+			// Bad coordinates
+			Input:    []byte(`{"type":"LineString","coordinates":"foo"}`),
+			Instance: &Line{},
+		},
+	}.fail(t)
 }
 
 func TestLineValue(t *testing.T) {
