@@ -118,24 +118,24 @@ func (polygon Polygon) String() string {
 	return s + polygonWKTSuffix
 }
 
-// poly is used for unmarshalling geojson.
-type poly [][][2]float64
-
 // UnmarshalJSON unmarshals the polygon from GeoJSON.
 func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 	g := &geometry{}
 
-	if err := json.Unmarshal(data, g); err != nil {
+	// Never fails since data is always valid JSON.
+	_ = json.Unmarshal(data, g)
+
+	if expected, got := PolygonType, g.Type; expected != got {
+		return fmt.Errorf("expected type %s, got %s", expected, got)
+	}
+
+	p := [][][2]float64{}
+
+	if err := json.Unmarshal(g.Coordinates, &p); err != nil {
 		return err
 	}
 
-	p := &poly{}
-
-	if err := json.Unmarshal(g.Coordinates, p); err != nil {
-		return err
-	}
-
-	*polygon = Polygon(*p)
+	*polygon = Polygon(p)
 
 	return nil
 }

@@ -110,7 +110,13 @@ func (point *Point) UnmarshalJSON(data []byte) error {
 	if expected, got := PointType, g.Type; expected != got {
 		return fmt.Errorf("expected %s type, got %s", expected, got)
 	}
-	return json.Unmarshal(g.Coordinates, point)
+
+	pt := [2]float64{}
+	if err := json.Unmarshal(g.Coordinates, &pt); err != nil {
+		return err
+	}
+	*point = pt
+	return nil
 }
 
 // Value converts a point to Well Known Text.

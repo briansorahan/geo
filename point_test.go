@@ -15,6 +15,14 @@ func TestPointCompare(t *testing.T) {
 	}.test(t)
 }
 
+func TestPointContains(t *testing.T) {
+	cases{
+		G:       &Point{1, 1},
+		Inside:  []Point{{1, 1}},
+		Outside: []Point{{1, 1.2}},
+	}.test(t)
+}
+
 func TestPointMarshalJSON(t *testing.T) {
 	marshalTestcases{
 		{
@@ -46,6 +54,27 @@ func TestPointScan(t *testing.T) {
 		},
 		{
 			Input:    7, // bad type
+			Instance: &Point{},
+		},
+	}.fail(t)
+}
+
+func TestPointUnmarshal(t *testing.T) {
+	unmarshalTestcases{
+		{
+			Input:    []byte(`{"type":"Point","coordinates":[1,1]}`),
+			Instance: &Point{},
+			Expected: &Point{1, 1},
+		},
+	}.pass(t)
+
+	unmarshalTestcases{
+		{
+			Input:    []byte(`{"type":"Punto","coordinates":[1,1]}`),
+			Instance: &Point{},
+		},
+		{
+			Input:    []byte(`{"type":"Point","coordinates":"bork"}`),
 			Instance: &Point{},
 		},
 	}.fail(t)

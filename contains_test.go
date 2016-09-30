@@ -1,7 +1,6 @@
 package geo
 
 import (
-	"math"
 	"testing"
 
 	kdgeo "github.com/kellydunn/golang-geo"
@@ -64,7 +63,7 @@ func BenchmarkPolygonGeoKellyDunn(b *testing.B) {
 	}
 }
 
-// TODO: make gdal easy to use
+// TODO: make gdal usable
 
 // const WGS84 = `
 // GEOGCS["WGS 84",
@@ -126,41 +125,7 @@ func BenchmarkPolygonBrian(b *testing.B) {
 	}
 }
 
-// func BenchmarkPolygonYan(b *testing.B) {
-// 	// Setup
-// 	polygon := Coordinates{
-// 		{
-// 			{0, 1},
-// 			{1, 2},
-// 			{2, 1},
-// 			{2, 0},
-// 			{1, -1},
-// 			{0, 0},
-// 			{0, 1},
-// 		},
-// 	}
-// 	point := Coordinate{1, 0}
-
-// 	b.ResetTimer()
-
-// 	// Test
-// 	for i := 0; i < b.N; i++ {
-// 		if contains := InsidePolygon(polygon, point); !contains {
-// 			b.Fatal("not contains")
-// 		}
-// 	}
-// }
-
-func hackyContains(p Circle, lng, lat float64) bool {
-	var (
-		dlng = (p.Coordinates[0] - lng) * float64(228200)
-		dlat = (p.Coordinates[1] - lat) * float64(364000)
-		d    = math.Sqrt(math.Pow(dlng, 2) + math.Pow(dlat, 2))
-	)
-	return d <= p.Radius
-}
-
-func BenchmarkCircleHaversine(b *testing.B) {
+func BenchmarkCircleContains(b *testing.B) {
 	// Setup
 	circle := Circle{
 		Coordinates: [2]float64{-100, 22},
@@ -170,64 +135,28 @@ func BenchmarkCircleHaversine(b *testing.B) {
 
 	b.ResetTimer()
 
-	// Test
-	for i := 0; i < b.N; i++ {
-		if contains := circle.ContainsHaversine(point); !contains {
-			b.Fatal("circle does not contain point")
+	// Test haversine distance calculation.
+	b.Run("haversine", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if contains := circle.ContainsHaversine(point); !contains {
+				b.Fatal("circle does not contain point")
+			}
 		}
-	}
-}
+	})
 
-func BenchmarkCircleSLC(b *testing.B) {
-	// Setup
-	circle := Circle{
-		Coordinates: [2]float64{-100, 22},
-		Radius:      1300,
-	}
-	point := Point{-100.00001, 22}
-
-	b.ResetTimer()
-
-	// Test
-	for i := 0; i < b.N; i++ {
-		if contains := circle.ContainsSLC(point); !contains {
-			b.Fatal("circle does not contain point")
+	b.Run("spherical law of cosines", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if contains := circle.ContainsSLC(point); !contains {
+				b.Fatal("circle does not contain point")
+			}
 		}
-	}
-}
+	})
 
-func BenchmarkCircleEquirectangular(b *testing.B) {
-	// Setup
-	circle := Circle{
-		Coordinates: [2]float64{-100, 22},
-		Radius:      1300,
-	}
-	point := Point{-100.00001, 22}
-
-	b.ResetTimer()
-
-	// Test
-	for i := 0; i < b.N; i++ {
-		if contains := circle.ContainsEquirectangular(point); !contains {
-			b.Fatal("circle does not contain point")
+	b.Run("equirectangular", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if contains := circle.ContainsEquirectangular(point); !contains {
+				b.Fatal("circle does not contain point")
+			}
 		}
-	}
-}
-
-func BenchmarkCircleHackyContains(b *testing.B) {
-	// Setup
-	circle := Circle{
-		Coordinates: [2]float64{-100, 22},
-		Radius:      1300,
-	}
-	point := Point{-100.00001, 22}
-
-	b.ResetTimer()
-
-	// Test
-	for i := 0; i < b.N; i++ {
-		if contains := hackyContains(circle, point[0], point[1]); !contains {
-			b.Fatal("circle does not contain point")
-		}
-	}
+	})
 }

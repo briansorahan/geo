@@ -103,11 +103,10 @@ func (coll *FeatureCollection) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("expected %s type, got %s", expected, got)
 	}
 
+	// Clear the collection and copy the unmarshalled features.
 	*coll = make([]Feature, len(fc.Features))
+	copy(*coll, fc.Features)
 
-	for i, feat := range fc.Features {
-		(*coll)[i] = feat
-	}
 	return nil
 }
 

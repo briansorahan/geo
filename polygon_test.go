@@ -2,8 +2,7 @@ package geo
 
 import "testing"
 
-func TestPolygon(t *testing.T) {
-	// Compare
+func TestPolygonCompare(t *testing.T) {
 	cases{
 		G: &Polygon{
 			{
@@ -18,6 +17,15 @@ func TestPolygon(t *testing.T) {
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
+					{1.4, 9.3},
+				},
+			},
+			&Polygon{
+				{
+					{1.2, 3.4},
+					{5.6, 7.8},
+				},
+				{
 					{1.4, 9.3},
 				},
 			},
@@ -53,7 +61,9 @@ func TestPolygon(t *testing.T) {
 			&Point{1.2, 3.4},
 		},
 	}.test(t)
+}
 
+func TestPolygonContains(t *testing.T) {
 	// Contains (square)
 	cases{
 		// Square
@@ -130,6 +140,24 @@ func TestPolygon(t *testing.T) {
 			{-1, 2},
 		},
 	}.test(t)
+}
+
+func TestPolygonEmpty(t *testing.T) {
+	var (
+		p        = Polygon{}
+		expected = "POLYGON EMPTY"
+	)
+	value, err := p.Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, ok := value.(string)
+	if !ok {
+		t.Fatalf("expected string, got %T", value)
+	}
+	if expected != got {
+		t.Fatalf("expected %s, got %s", expected, got)
+	}
 }
 
 func TestPolygonMarshal(t *testing.T) {
@@ -221,49 +249,6 @@ func TestPolygonScan(t *testing.T) {
 	}
 }
 
-func TestPolygonValue(t *testing.T) {
-	var (
-		p = Polygon{
-			{
-				{1.2, 3.4},
-				{5.6, 7.8},
-				{8.7, 6.5},
-				{4.3, 2.1},
-			},
-		}
-		expected = `POLYGON((1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1))`
-	)
-	value, err := p.Value()
-	if err != nil {
-		t.Fatal(err)
-	}
-	got, ok := value.(string)
-	if !ok {
-		t.Fatalf("expected string, got %T", value)
-	}
-	if expected != got {
-		t.Fatalf("expected %s, got %s", expected, got)
-	}
-}
-
-func TestPolygonEmpty(t *testing.T) {
-	var (
-		p        = Polygon{}
-		expected = "POLYGON EMPTY"
-	)
-	value, err := p.Value()
-	if err != nil {
-		t.Fatal(err)
-	}
-	got, ok := value.(string)
-	if !ok {
-		t.Fatalf("expected string, got %T", value)
-	}
-	if expected != got {
-		t.Fatalf("expected %s, got %s", expected, got)
-	}
-}
-
 func TestPolygonString(t *testing.T) {
 	for _, c := range []struct {
 		Input    Polygon
@@ -289,5 +274,58 @@ func TestPolygonString(t *testing.T) {
 		if expected, got := c.Expected, c.Input.String(); expected != got {
 			t.Fatalf("expected %s, got %s", expected, got)
 		}
+	}
+}
+
+func TestPolygonUnmarshalJSON(t *testing.T) {
+	unmarshalTestcases{
+		{
+			Input:    []byte(`{"type":"Polygon","coordinates":[[[0,0],[0,1],[1,1],[1,0]]]}`),
+			Instance: &Polygon{},
+			Expected: &Polygon{
+				{
+					{0, 0},
+					{0, 1},
+					{1, 1},
+					{1, 0},
+				},
+			},
+		},
+	}.pass(t)
+
+	unmarshalTestcases{
+		{
+			Input:    []byte(`{"type":"Porygon","coordinates":[[[0,0],[0,1],[1,1],[1,0]]]}`),
+			Instance: &Polygon{},
+		},
+		{
+			Input:    []byte(`{"type":"Polygon","coordinates":"bjork"}`),
+			Instance: &Polygon{},
+		},
+	}.fail(t)
+}
+
+func TestPolygonValue(t *testing.T) {
+	var (
+		p = Polygon{
+			{
+				{1.2, 3.4},
+				{5.6, 7.8},
+				{8.7, 6.5},
+				{4.3, 2.1},
+			},
+		}
+		expected = `POLYGON((1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1))`
+	)
+	value, err := p.Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, ok := value.(string)
+	if !ok {
+		t.Fatalf("expected string, got %T", value)
+	}
+	if expected != got {
+		t.Fatalf("expected %s, got %s", expected, got)
 	}
 }
