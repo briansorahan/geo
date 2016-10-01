@@ -31,7 +31,7 @@ build:
         name: go get
         code: |
           go get -t ./...
-	  go get github.com/mattn/goveralls
+          go get github.com/mattn/goveralls
 
     # Build the project
     - script:
@@ -43,4 +43,4 @@ build:
     - script:
         name: go test
         code: |
-	  goveralls
+          goveralls
