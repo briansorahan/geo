@@ -4,41 +4,42 @@ import (
 	"testing"
 
 	kdgeo "github.com/kellydunn/golang-geo"
-	"github.com/paulsmith/gogeos/geos"
+	// "github.com/paulsmith/gogeos/geos"
 )
 
-func BenchmarkPolygonGeosPaulSmit(b *testing.B) {
-	// Setup
-	polygon, err := geos.NewPolygon([]geos.Coord{
-		{0, 1, 0},
-		{1, 2, 0},
-		{2, 1, 0},
-		{2, 0, 0},
-		{1, -1, 0},
-		{0, 0, 0},
-		{0, 1, 0},
-	})
-	if err != nil {
-		b.Fatal(err)
-	}
-	point, err := geos.NewPoint(geos.Coord{X: 1, Y: 0, Z: 0})
-	if err != nil {
-		b.Fatal(err)
-	}
+// This test is troublesome in CI as it depends on a C library.
+// func BenchmarkPolygonGeosPaulSmit(b *testing.B) {
+// 	// Setup
+// 	polygon, err := geos.NewPolygon([]geos.Coord{
+// 		{0, 1, 0},
+// 		{1, 2, 0},
+// 		{2, 1, 0},
+// 		{2, 0, 0},
+// 		{1, -1, 0},
+// 		{0, 0, 0},
+// 		{0, 1, 0},
+// 	})
+// 	if err != nil {
+// 		b.Fatal(err)
+// 	}
+// 	point, err := geos.NewPoint(geos.Coord{X: 1, Y: 0, Z: 0})
+// 	if err != nil {
+// 		b.Fatal(err)
+// 	}
 
-	b.ResetTimer()
+// 	b.ResetTimer()
 
-	// Test
-	for i := 0; i < b.N; i++ {
-		contains, err := polygon.Contains(point)
-		if err != nil {
-			b.Fatal(err)
-		}
-		if !contains {
-			b.Fatal("not contains")
-		}
-	}
-}
+// 	// Test
+// 	for i := 0; i < b.N; i++ {
+// 		contains, err := polygon.Contains(point)
+// 		if err != nil {
+// 			b.Fatal(err)
+// 		}
+// 		if !contains {
+// 			b.Fatal("not contains")
+// 		}
+// 	}
+// }
 
 func BenchmarkPolygonGeoKellyDunn(b *testing.B) {
 	// Setup
