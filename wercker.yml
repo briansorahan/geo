@@ -43,4 +43,4 @@ build:
     - script:
         name: go test
         code: |
-	  go test
+          go test
