@@ -14,6 +14,7 @@ const (
 	FeatureCollectionType  = "FeatureCollection"
 	FeatureType            = "Feature"
 	GeometryCollectionType = "GeometryCollection"
+	MultiLineType          = "MultiLine"
 	LineType               = "LineString"
 	MultiPointType         = "MultiPoint"
 	PointType              = "Point"
@@ -106,6 +107,13 @@ func (g geometry) unmarshalCoordinates() (Geometry, error) {
 		}
 		l := Line(ln)
 		return &l, nil
+	case MultiLineType:
+		mln := [][][2]float64{}
+		if err := json.Unmarshal(g.Coordinates, &mln); err != nil {
+			return nil, err
+		}
+		ml := MultiLine(mln)
+		return &ml, nil
 	case PolygonType:
 		poly := [][][2]float64{}
 		if err := json.Unmarshal(g.Coordinates, &poly); err != nil {

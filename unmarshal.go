@@ -23,7 +23,7 @@ func Unmarshal(data []byte) (Geometry, error) {
 		return nil, err
 	}
 	switch gj.Type {
-	case CircleType, LineType, MultiPointType, PointType, PolygonType:
+	case CircleType, LineType, MultiLineType, MultiPointType, PointType, PolygonType:
 		return UnmarshalGeometry(data)
 	case FeatureType:
 		var (
