@@ -10,12 +10,15 @@ import (
 
 // Geometry types.
 const (
-	CircleType            = "Circle"
-	FeatureCollectionType = "FeatureCollection"
-	FeatureType           = "Feature"
-	LineType              = "LineString"
-	PointType             = "Point"
-	PolygonType           = "Polygon"
+	CircleType             = "Circle"
+	FeatureCollectionType  = "FeatureCollection"
+	FeatureType            = "Feature"
+	GeometryCollectionType = "GeometryCollection"
+	MultiLineType          = "MultiLine"
+	LineType               = "LineString"
+	MultiPointType         = "MultiPoint"
+	PointType              = "Point"
+	PolygonType            = "Polygon"
 )
 
 // Geometry defines the interface of every geometry type.
@@ -91,6 +94,12 @@ func (g geometry) unmarshalCoordinates() (Geometry, error) {
 		}
 		p := Point(pt)
 		return &p, nil
+	case MultiPointType:
+		mp := MultiPoint{}
+		if err := json.Unmarshal(g.Coordinates, &mp); err != nil {
+			return nil, err
+		}
+		return &mp, nil
 	case LineType:
 		ln := [][2]float64{}
 		if err := json.Unmarshal(g.Coordinates, &ln); err != nil {
@@ -98,6 +107,13 @@ func (g geometry) unmarshalCoordinates() (Geometry, error) {
 		}
 		l := Line(ln)
 		return &l, nil
+	case MultiLineType:
+		mln := [][][2]float64{}
+		if err := json.Unmarshal(g.Coordinates, &mln); err != nil {
+			return nil, err
+		}
+		ml := MultiLine(mln)
+		return &ml, nil
 	case PolygonType:
 		poly := [][][2]float64{}
 		if err := json.Unmarshal(g.Coordinates, &poly); err != nil {
