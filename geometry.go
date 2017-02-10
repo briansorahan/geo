@@ -14,7 +14,7 @@ const (
 	FeatureCollectionType  = "FeatureCollection"
 	FeatureType            = "Feature"
 	GeometryCollectionType = "GeometryCollection"
-	MultiLineType          = "MultiLine"
+	MultiLineType          = "MultiLineString"
 	LineType               = "LineString"
 	MultiPointType         = "MultiPoint"
 	PointType              = "Point"
