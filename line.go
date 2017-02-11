@@ -13,7 +13,7 @@ const (
 )
 
 // Line is a line.
-type Line [][2]float64
+type Line [][3]float64
 
 // Compare compares one line to another.
 func (line Line) Compare(g Geometry) bool {
@@ -30,7 +30,7 @@ func (line Line) Contains(p Point) bool {
 }
 
 // segmentContains returns true if p lies on the line segment that connects s1 and s2.
-func segmentContains(s1, s2, p [2]float64) bool {
+func segmentContains(s1, s2, p [3]float64) bool {
 	// Return false if p is outside of the bounding box around s1 and s2.
 	if (p[0] > s1[0] && p[0] > s2[0]) || (p[0] < s1[0] && p[0] < s2[0]) {
 		return false

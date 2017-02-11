@@ -18,7 +18,7 @@ var (
 )
 
 // MultiLine is an array of Line's.
-type MultiLine [][][2]float64
+type MultiLine [][][3]float64
 
 // Compare compares one MultiLine to another.
 func (ml MultiLine) Compare(g Geometry) bool {
@@ -129,7 +129,7 @@ func (ml *MultiLine) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("expected type %s, got %s", expected, got)
 	}
 
-	p := [][][2]float64{}
+	p := [][][3]float64{}
 
 	if err := json.Unmarshal(g.Coordinates, &p); err != nil {
 		return err

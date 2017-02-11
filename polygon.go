@@ -18,7 +18,7 @@ var (
 )
 
 // Polygon is a GeoJSON Polygon.
-type Polygon [][][2]float64
+type Polygon [][][3]float64
 
 // Compare compares one polygon to another.
 func (polygon Polygon) Compare(g Geometry) bool {
@@ -129,7 +129,7 @@ func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("expected type %s, got %s", expected, got)
 	}
 
-	p := [][][2]float64{}
+	p := [][][3]float64{}
 
 	if err := json.Unmarshal(g.Coordinates, &p); err != nil {
 		return err

@@ -20,7 +20,7 @@ var (
 )
 
 // MultiPolygon is a GeoJSON MultiPolygon.
-type MultiPolygon [][][][2]float64
+type MultiPolygon [][][][3]float64
 
 // Compare compares one polygon to another.
 func (multiPolygon MultiPolygon) Compare(g Geometry) bool {
@@ -109,7 +109,7 @@ func (multiPolygon *MultiPolygon) scan(s string) error {
 	// Get the coordinates.
 	for _, polys := range polygons {
 		var (
-			poly   = [][][2]float64{}
+			poly   = [][][3]float64{}
 			polyss = strings.Split(polys, "),(")
 		)
 		for _, ss := range polyss {
@@ -158,7 +158,7 @@ func (multiPolygon *MultiPolygon) UnmarshalJSON(data []byte) error {
 	if expected, got := MultiPolygonType, g.Type; expected != got {
 		return fmt.Errorf("expected type %s, got %s", expected, got)
 	}
-	p := [][][][2]float64{}
+	p := [][][][3]float64{}
 	if err := json.Unmarshal(g.Coordinates, &p); err != nil {
 		return err
 	}

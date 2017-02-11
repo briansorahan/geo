@@ -8,7 +8,7 @@ import (
 )
 
 // pointsCompare compares two slices of points.
-func pointsCompare(p1, p2 [][2]float64) bool {
+func pointsCompare(p1, p2 [][3]float64) bool {
 	if len(p1) != len(p2) {
 		return false
 	}
@@ -24,7 +24,7 @@ func pointsCompare(p1, p2 [][2]float64) bool {
 }
 
 // pointsContain returns true if the
-func pointsContain(pts [][2]float64, pt [2]float64) bool {
+func pointsContain(pts [][3]float64, pt [3]float64) bool {
 	if len(pts) < 2 {
 		return false
 	}
@@ -43,7 +43,7 @@ func pointsContain(pts [][2]float64, pt [2]float64) bool {
 }
 
 // pointsMarshalJSON converts a list of points to JSON.
-func pointsMarshalJSON(points [][2]float64, prefix, suffix string) []byte {
+func pointsMarshalJSON(points [][3]float64, prefix, suffix string) []byte {
 	s := prefix
 	for i, point := range points {
 		if i == 0 {
@@ -64,7 +64,7 @@ func pointsMarshalJSON(points [][2]float64, prefix, suffix string) []byte {
 // * (X0 Y0,X1 Y1,X2 Y2
 // * X0 Y0,X1 Y1,X2 Y2)
 // * (X0 Y0,X1 Y1,X2 Y2)
-func pointsScan(s string) ([][2]float64, error) {
+func pointsScan(s string) ([][3]float64, error) {
 	// Trim leading and trailing parens.
 	leadingIdx := 0
 	for s[leadingIdx] == '(' {
@@ -82,10 +82,10 @@ func pointsScan(s string) ([][2]float64, error) {
 	// At this point s should look like this:
 	// x x, x x, x x, ...
 	// Where x is a float.
-	points := [][2]float64{}
+	points := [][3]float64{}
 	for _, coords := range strings.Split(s, ",") {
 		var (
-			pair = [2]float64{}
+			pair = [3]float64{}
 			xy   = strings.Split(strings.TrimSpace(coords), " ")
 		)
 		if len(xy) != 2 {
@@ -104,7 +104,7 @@ func pointsScan(s string) ([][2]float64, error) {
 }
 
 // pointsScanPrefix scans a string form points, and expects the given prefix.
-func pointsScanPrefix(s, prefix, typeName string) ([][2]float64, error) {
+func pointsScanPrefix(s, prefix, typeName string) ([][3]float64, error) {
 	if len(s) <= len(prefix) {
 		return nil, fmt.Errorf("could not scan %s from %s", typeName, s)
 	}
@@ -112,7 +112,7 @@ func pointsScanPrefix(s, prefix, typeName string) ([][2]float64, error) {
 }
 
 // pointsString converts a slice of points to Well Known Text.
-func pointsString(points [][2]float64) string {
+func pointsString(points [][3]float64) string {
 	s := "("
 	s += strconv.FormatFloat(points[0][0], 'f', -1, 64)
 	s += " " + strconv.FormatFloat(points[0][1], 'f', -1, 64)
@@ -124,7 +124,7 @@ func pointsString(points [][2]float64) string {
 }
 
 // pointsUnmarshal unmarshals a slice of points
-func pointsUnmarshal(data []byte, expectedType string) ([][2]float64, error) {
+func pointsUnmarshal(data []byte, expectedType string) ([][3]float64, error) {
 	g := geometry{}
 
 	// Never fails because data is always valid JSON.
@@ -134,7 +134,7 @@ func pointsUnmarshal(data []byte, expectedType string) ([][2]float64, error) {
 		return nil, fmt.Errorf("expected type %s, got %s", expected, got)
 	}
 
-	pts := [][2]float64{}
+	pts := [][3]float64{}
 	if err := json.Unmarshal(g.Coordinates, &pts); err != nil {
 		return nil, err
 	}

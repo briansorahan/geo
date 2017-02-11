@@ -103,7 +103,7 @@ func BenchmarkPolygonGeoKellyDunn(b *testing.B) {
 
 func BenchmarkPolygonBrian(b *testing.B) {
 	// Setup
-	polygon := Polygon([][][2]float64{
+	polygon := Polygon([][][3]float64{
 		{
 			{0, 1},
 			{1, 2},
@@ -129,7 +129,7 @@ func BenchmarkPolygonBrian(b *testing.B) {
 func BenchmarkCircleContains(b *testing.B) {
 	// Setup
 	circle := Circle{
-		Coordinates: [2]float64{-100, 22},
+		Coordinates: [3]float64{-100, 22},
 		Radius:      1300,
 	}
 	point := Point{-100.00001, 22}

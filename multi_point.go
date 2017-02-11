@@ -10,7 +10,7 @@ const (
 )
 
 // MultiPoint is a collection of points.
-type MultiPoint [][2]float64
+type MultiPoint [][3]float64
 
 // Compare compares one MultiPoint to another.
 func (mp MultiPoint) Compare(g Geometry) bool {

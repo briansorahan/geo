@@ -80,37 +80,37 @@ func (g geometry) unmarshalCoordinates() (geom Geometry, err error) {
 	default:
 		return nil, fmt.Errorf("unrecognized geometry type: %s", g.Type)
 	case PointType:
-		pt := [2]float64{}
+		pt := [3]float64{}
 		err = json.Unmarshal(g.Coordinates, &pt)
 		p := Point(pt)
 		geom = &p
 	case MultiPointType:
-		mpt := [][2]float64{}
+		mpt := [][3]float64{}
 		err = json.Unmarshal(g.Coordinates, &mpt)
 		mp := MultiPoint(mpt)
 		geom = &mp
 	case LineType:
-		ln := [][2]float64{}
+		ln := [][3]float64{}
 		err = json.Unmarshal(g.Coordinates, &ln)
 		l := Line(ln)
 		geom = &l
 	case MultiLineType:
-		mln := [][][2]float64{}
+		mln := [][][3]float64{}
 		err = json.Unmarshal(g.Coordinates, &mln)
 		ml := MultiLine(mln)
 		geom = &ml
 	case PolygonType:
-		poly := [][][2]float64{}
+		poly := [][][3]float64{}
 		err = json.Unmarshal(g.Coordinates, &poly)
 		p := Polygon(poly)
 		geom = &p
 	case MultiPolygonType:
-		mpoly := [][][][2]float64{}
+		mpoly := [][][][3]float64{}
 		err = json.Unmarshal(g.Coordinates, &mpoly)
 		mp := MultiPolygon(mpoly)
 		geom = &mp
 	case CircleType:
-		center := [2]float64{}
+		center := [3]float64{}
 		err = json.Unmarshal(g.Coordinates, &center)
 		geom = &Circle{
 			Coordinates: center,
