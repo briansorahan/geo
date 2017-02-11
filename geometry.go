@@ -19,6 +19,7 @@ const (
 	MultiPointType         = "MultiPoint"
 	PointType              = "Point"
 	PolygonType            = "Polygon"
+	MultiPolygonType       = "MultiPolygon"
 )
 
 // Geometry defines the interface of every geometry type.
@@ -103,6 +104,11 @@ func (g geometry) unmarshalCoordinates() (geom Geometry, err error) {
 		err = json.Unmarshal(g.Coordinates, &poly)
 		p := Polygon(poly)
 		geom = &p
+	case MultiPolygonType:
+		mpoly := [][][][2]float64{}
+		err = json.Unmarshal(g.Coordinates, &mpoly)
+		mp := MultiPolygon(mpoly)
+		geom = &mp
 	case CircleType:
 		center := [2]float64{}
 		err = json.Unmarshal(g.Coordinates, &center)
