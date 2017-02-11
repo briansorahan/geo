@@ -78,10 +78,9 @@ func TestMultiPointScan(t *testing.T) {
 
 	// Fail
 	for _, c := range []interface{}{
-		4,        // wrong type
-		`LINE()`, // wrong prefix
-		[]byte(`MULTIPOINT((3 3, 2 2))`), // too many parentheses
-		`MULTIPOINT(0, 0, 1, 1)`,         // should be spaces in between coordinates
+		4,                        // wrong type
+		`LINE()`,                 // wrong prefix
+		`MULTIPOINT(0, 0, 1, 1)`, // should be spaces in between coordinates
 	} {
 		l := &MultiPoint{}
 		if err := l.Scan(c); err == nil {

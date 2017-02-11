@@ -200,6 +200,23 @@ func TestFeatureUnmarshal(t *testing.T) {
 			Instance: &Feature{},
 		},
 		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[-113.1454418321263,33.52932582146817],[-113.1454418321263,33.52897252424949],[-113.1454027724575,33.52897252424949],[-113.1454027724575,33.52932582146817],[-113.1454418321263,33.52932582146817]]]]}}`),
+			Expected: Feature{
+				Geometry: &MultiPolygon{
+					{
+						{
+							{-113.1454418321263, 33.52932582146817},
+							{-113.1454418321263, 33.52897252424949},
+							{-113.1454027724575, 33.52897252424949},
+							{-113.1454027724575, 33.52932582146817},
+							{-113.1454418321263, 33.52932582146817},
+						},
+					},
+				},
+			},
+			Instance: &Feature{},
+		},
+		{
 			Input: []byte(`{"type":"Feature","geometry":{"type":"Circle","coordinates":[3,2.5],"radius":1}}`),
 			Expected: Feature{
 				Geometry: &Circle{

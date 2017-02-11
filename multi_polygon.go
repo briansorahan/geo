@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -46,17 +48,12 @@ func (multiPolygon MultiPolygon) Compare(g Geometry) bool {
 // Contains uses the ray casting algorithm to decide
 // if the point is contained in the polygon.
 func (multiPolygon MultiPolygon) Contains(point Point) bool {
-	intersections := 0
 	for _, poly := range multiPolygon {
-		for _, edge := range poly {
-			for j, vertex := range edge {
-				if point.RayhIntersects(edge[(j+1)%len(poly)], vertex) {
-					intersections++
-				}
-			}
+		if !Polygon(poly).Contains(point) {
+			return false
 		}
 	}
-	return (intersections % 2) == 1
+	return true
 }
 
 // MarshalJSON returns the GeoJSON representation of the polygon.
@@ -90,26 +87,32 @@ func (multiPolygon *MultiPolygon) Scan(src interface{}) error {
 // scan scans a polygon from a Well Known Text string.
 func (multiPolygon *MultiPolygon) scan(s string) error {
 	if i := strings.Index(s, multiPolygonWKTPrefix); i != 0 {
-		return fmt.Errorf("malformed polygon %s", s)
+		return errors.Errorf("malformed multi polygon %s", s)
 	}
 	l := len(s)
 
 	if s[l-len(multiPolygonWKTSuffix):] != multiPolygonWKTSuffix {
-		return fmt.Errorf("malformed polygon %s", s)
+		return errors.Errorf("malformed multi polygon %s", s)
 	}
 	s = s[len(multiPolygonWKTPrefix) : l-len(multiPolygonWKTSuffix)]
 
 	// empty the polygon
 	*multiPolygon = MultiPolygon{}
 
-	// get the coordinates
-	multiPolygons := strings.Split(s, "),(")
-	for _, polyss := range multiPolygons {
+	// Split the string into polygons.
+	// We have to split on double parens because single parens
+	// would split the polygons themselves.
+	// The first polygon will have a leading double parens, i.e. "(("
+	// and the last polygon will have a trailing double parens, i.e. "))"
+	polygons := strings.Split(s, ")),((")
+
+	// Get the coordinates.
+	for _, polys := range polygons {
 		var (
-			polys = strings.Split(polyss, "),(")
-			poly  = [][][2]float64{}
+			poly   = [][][2]float64{}
+			polyss = strings.Split(polys, "),(")
 		)
-		for _, ss := range polys {
+		for _, ss := range polyss {
 			points, err := pointsScan(ss)
 			if err != nil {
 				return err
@@ -155,15 +158,11 @@ func (multiPolygon *MultiPolygon) UnmarshalJSON(data []byte) error {
 	if expected, got := MultiPolygonType, g.Type; expected != got {
 		return fmt.Errorf("expected type %s, got %s", expected, got)
 	}
-
 	p := [][][][2]float64{}
-
 	if err := json.Unmarshal(g.Coordinates, &p); err != nil {
 		return err
 	}
-
 	*multiPolygon = MultiPolygon(p)
-
 	return nil
 }
 
