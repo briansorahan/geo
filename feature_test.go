@@ -50,6 +50,12 @@ func TestFeatureMarshal(t *testing.T) {
 			},
 			Expected: `{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"properties":null}`,
 		},
+		{
+			Feature: Feature{
+				Geometry: &Line{{0, 0}, {1, 2}},
+			},
+			Expected: `{"type":"Feature","geometry":{"type":"LineString","coordinates":[[0,0],[1,2]]},"properties":null}`,
+		},
 	} {
 		got, err := testcase.Feature.MarshalJSON()
 		if err != nil {
@@ -150,9 +156,38 @@ func TestFeatureUnmarshal(t *testing.T) {
 			Instance: &Feature{},
 		},
 		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"LineString","coordinates":[[0,0],[3,2.5]]}}`),
+			Expected: Feature{
+				Geometry: &Line{{0, 0}, {3, 2.5}},
+			},
+			Instance: &Feature{},
+		},
+		{
 			Input: []byte(`{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-113.1454418321263,33.52932582146817],[-113.1454418321263,33.52897252424949],[-113.1454027724575,33.52897252424949],[-113.1454027724575,33.52932582146817],[-113.1454418321263,33.52932582146817]]]}}`),
 			Expected: Feature{
 				Geometry: &Polygon{
+					{
+						{-113.1454418321263, 33.52932582146817},
+						{-113.1454418321263, 33.52897252424949},
+						{-113.1454027724575, 33.52897252424949},
+						{-113.1454027724575, 33.52932582146817},
+						{-113.1454418321263, 33.52932582146817},
+					},
+				},
+			},
+			Instance: &Feature{},
+		},
+		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"MultiPoint","coordinates":[[0,0],[3,2.5]]}}`),
+			Expected: Feature{
+				Geometry: &MultiPoint{{0, 0}, {3, 2.5}},
+			},
+			Instance: &Feature{},
+		},
+		{
+			Input: []byte(`{"type":"Feature","geometry":{"type":"MultiLineString","coordinates":[[[-113.1454418321263,33.52932582146817],[-113.1454418321263,33.52897252424949],[-113.1454027724575,33.52897252424949],[-113.1454027724575,33.52932582146817],[-113.1454418321263,33.52932582146817]]]}}`),
+			Expected: Feature{
+				Geometry: &MultiLine{
 					{
 						{-113.1454418321263, 33.52932582146817},
 						{-113.1454418321263, 33.52897252424949},
@@ -179,7 +214,7 @@ func TestFeatureUnmarshal(t *testing.T) {
 			t.Fatalf("fail case %d: %s", i, err)
 		}
 		if expected, got := testcase.Expected.Geometry, testcase.Instance.Geometry; !expected.Compare(got) {
-			t.Fatalf("expected %v, got %v", expected, got)
+			t.Fatalf("(case %d) expected %v, got %v", i, expected, got)
 		}
 	}
 	// Fail

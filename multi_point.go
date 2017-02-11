@@ -1,10 +1,6 @@
 package geo
 
-import (
-	"database/sql/driver"
-	"encoding/json"
-	"fmt"
-)
+import "database/sql/driver"
 
 const (
 	mpWKTEmpty   = `MULTIPOINT EMPTY`
@@ -27,21 +23,7 @@ func (mp MultiPoint) Compare(g Geometry) bool {
 
 // Contains determines if the MultiPoint contains a point.
 func (mp MultiPoint) Contains(p Point) bool {
-	if len(mp) < 2 {
-		return false
-	}
-	for i, vertex := range mp {
-		if vertex[0] == p[0] && vertex[1] == p[1] {
-			return true
-		}
-		if i == 0 {
-			continue
-		}
-		if segmentContains(vertex, mp[i-1], p) {
-			return true
-		}
-	}
-	return false
+	return pointsContain(mp, p)
 }
 
 // MarshalJSON marshals the MultiPoint to JSON.
@@ -56,10 +38,7 @@ func (mp *MultiPoint) Scan(src interface{}) error {
 
 // scan scans a MultiPoint from a Well Known Text string.
 func (mp *MultiPoint) scan(s string) error {
-	if len(s) <= len(mpWKTPrefix) {
-		return fmt.Errorf("could not scan MultiPoint from %s", s)
-	}
-	points, err := pointsScan(s[len(mpWKTPrefix):])
+	points, err := pointsScanPrefix(s, mpWKTPrefix, MultiPointType)
 	if err != nil {
 		return err
 	}
@@ -77,20 +56,11 @@ func (mp MultiPoint) String() string {
 
 // UnmarshalJSON unmarshals a MultiPoint from GeoJSON.
 func (mp *MultiPoint) UnmarshalJSON(data []byte) error {
-	g := geometry{}
-
-	// Never fails because data is always valid JSON.
-	_ = json.Unmarshal(data, &g)
-
-	if expected, got := MultiPointType, g.Type; expected != got {
-		return fmt.Errorf("expected type %s, got %s", expected, got)
-	}
-
-	ln := [][2]float64{}
-	if err := json.Unmarshal(g.Coordinates, &ln); err != nil {
+	pts, err := pointsUnmarshal(data, MultiPointType)
+	if err != nil {
 		return err
 	}
-	*mp = ln
+	*mp = pts
 	return nil
 }
 

@@ -87,25 +87,31 @@ func (gc GeometryCollection) String() string {
 
 // geometryCollection is a utility type used to unmarshal a geojson GeometryCollection.
 type geometryCollection struct {
-	Type       string     `json:"type"`
-	Geometries []Geometry `json:"geometries"`
+	Type       string      `json:"type"`
+	Geometries []*geometry `json:"geometries"`
 }
 
 // UnmarshalJSON unmarshals the geometry collection from geojson.
 func (gc *GeometryCollection) UnmarshalJSON(data []byte) error {
-	fc := geometryCollection{}
+	coll := geometryCollection{}
 
 	// Never fails because data is always valid JSON.
-	_ = json.Unmarshal(data, &fc)
+	_ = json.Unmarshal(data, &coll)
 
 	// Check the type.
-	if expected, got := GeometryCollectionType, fc.Type; expected != got {
+	if expected, got := GeometryCollectionType, coll.Type; expected != got {
 		return fmt.Errorf("expected %s type, got %s", expected, got)
 	}
 
 	// Clear the collection and copy the unmarshalled geometries.
-	*gc = make([]Geometry, len(fc.Geometries))
-	copy(*gc, fc.Geometries)
+	*gc = make([]Geometry, len(coll.Geometries))
+	for i, g := range coll.Geometries {
+		gg, err := g.unmarshalCoordinates()
+		if err != nil {
+			return err
+		}
+		(*gc)[i] = gg
+	}
 
 	return nil
 }

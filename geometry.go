@@ -66,15 +66,6 @@ func ScanGeometry(s string) (Geometry, error) {
 	return nil, fmt.Errorf("unrecognized geometry: %s", s)
 }
 
-// UnmarshalGeometry unmarshals a geometry from geojson data.
-func UnmarshalGeometry(data []byte) (Geometry, error) {
-	g := &geometry{}
-	if err := json.Unmarshal(data, g); err != nil {
-		return nil, err
-	}
-	return g.unmarshalCoordinates()
-}
-
 // geometry is a utility type used to unmarshal geometries from JSON.
 type geometry struct {
 	Type        string          `json:"type"`
@@ -83,52 +74,42 @@ type geometry struct {
 }
 
 // Geometry returns a Geometry, or an error if Type is invalid.
-func (g geometry) unmarshalCoordinates() (Geometry, error) {
+func (g geometry) unmarshalCoordinates() (geom Geometry, err error) {
 	switch g.Type {
 	default:
 		return nil, fmt.Errorf("unrecognized geometry type: %s", g.Type)
 	case PointType:
 		pt := [2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &pt); err != nil {
-			return nil, err
-		}
+		err = json.Unmarshal(g.Coordinates, &pt)
 		p := Point(pt)
-		return &p, nil
+		geom = &p
 	case MultiPointType:
-		mp := MultiPoint{}
-		if err := json.Unmarshal(g.Coordinates, &mp); err != nil {
-			return nil, err
-		}
-		return &mp, nil
+		mpt := [][2]float64{}
+		err = json.Unmarshal(g.Coordinates, &mpt)
+		mp := MultiPoint(mpt)
+		geom = &mp
 	case LineType:
 		ln := [][2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &ln); err != nil {
-			return nil, err
-		}
+		err = json.Unmarshal(g.Coordinates, &ln)
 		l := Line(ln)
-		return &l, nil
+		geom = &l
 	case MultiLineType:
 		mln := [][][2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &mln); err != nil {
-			return nil, err
-		}
+		err = json.Unmarshal(g.Coordinates, &mln)
 		ml := MultiLine(mln)
-		return &ml, nil
+		geom = &ml
 	case PolygonType:
 		poly := [][][2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &poly); err != nil {
-			return nil, err
-		}
+		err = json.Unmarshal(g.Coordinates, &poly)
 		p := Polygon(poly)
-		return &p, nil
+		geom = &p
 	case CircleType:
 		center := [2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &center); err != nil {
-			return nil, err
-		}
-		return &Circle{
+		err = json.Unmarshal(g.Coordinates, &center)
+		geom = &Circle{
 			Coordinates: center,
 			Radius:      g.Radius,
-		}, nil
+		}
 	}
+	return geom, err
 }
