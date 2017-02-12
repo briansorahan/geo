@@ -72,6 +72,7 @@ type geometry struct {
 	Type        string          `json:"type"`
 	Coordinates json.RawMessage `json:"coordinates"`
 	Radius      float64         `json:"radius"` // For circles!
+	BBox        []float64       `json:"bbox"`
 }
 
 // Geometry returns a Geometry, or an error if Type is invalid.
@@ -116,6 +117,9 @@ func (g geometry) unmarshalCoordinates() (geom Geometry, err error) {
 			Coordinates: center,
 			Radius:      g.Radius,
 		}
+	}
+	if len(g.BBox) > 0 {
+		return WithBBox(g.BBox, geom), err
 	}
 	return geom, err
 }
