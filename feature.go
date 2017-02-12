@@ -73,10 +73,25 @@ type feature struct {
 	Type       string          `json:"type"`
 	Geometry   json.RawMessage `json:"geometry"`
 	Properties interface{}     `json:"properties"`
+	BBox       []float64       `json:"bbox"`
 }
 
 // UnmarshalJSON unmarshals a feature from JSON.
 func (f *Feature) UnmarshalJSON(data []byte) error {
+	ff, _, err := unmarshalFeature(data)
+	if err != nil {
+		return err
+	}
+	*f = *ff
+	return nil
+}
+
+// Value returns well known text for the feature.
+func (f Feature) Value() (driver.Value, error) {
+	return f.Geometry.Value()
+}
+
+func unmarshalFeature(data []byte) (*Feature, *feature, error) {
 	feat := feature{}
 
 	// Never fails because data is always valid JSON.
@@ -84,28 +99,33 @@ func (f *Feature) UnmarshalJSON(data []byte) error {
 
 	// Check the type.
 	if expected, got := FeatureType, feat.Type; expected != got {
-		return fmt.Errorf("expected type %s, got %s", expected, got)
+		return nil, nil, fmt.Errorf("expected type %s, got %s", expected, got)
 	}
 
 	g := geometry{}
 
 	if err := json.Unmarshal(feat.Geometry, &g); err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	// Unmarshal the coordinates into one of our Geometry types.
 	geom, err := g.unmarshalCoordinates()
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
-
+	f := &Feature{}
 	f.Geometry = geom
 	f.Properties = feat.Properties
-
-	return nil
+	return f, &feat, nil
 }
 
-// Value returns well known text for the feature.
-func (f Feature) Value() (driver.Value, error) {
-	return f.Geometry.Value()
+func unmarshalFeatureBBox(data []byte) (Geometry, error) {
+	f, ff, err := unmarshalFeature(data)
+	if err != nil {
+		return nil, err
+	}
+	if len(ff.BBox) > 0 {
+		return WithBBox(ff.BBox, f), nil
+	}
+	return f, nil
 }
