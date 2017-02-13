@@ -10,7 +10,6 @@ type blob struct {
 }
 
 // UnmarshalJSON unmarshals any GeoJSON type from a JSON blob.
-// TODO: unmarshal bbox'es for Feature, FeatureCollection and GeometryCollection
 func UnmarshalJSON(data []byte) (Geometry, error) {
 	var (
 		geom = &geometry{}
