@@ -14,8 +14,8 @@ const (
 // FeatureCollection represents a feature collection.
 type FeatureCollection []Feature
 
-// Compare compares one feature collection to another.
-func (coll FeatureCollection) Compare(g Geometry) bool {
+// Equal compares one feature collection to another.
+func (coll FeatureCollection) Equal(g Geometry) bool {
 	other, ok := g.(*FeatureCollection)
 	if !ok {
 		return false
@@ -24,7 +24,7 @@ func (coll FeatureCollection) Compare(g Geometry) bool {
 		return false
 	}
 	for i, feat := range coll {
-		if !feat.Compare(&(*other)[i]) {
+		if !feat.Equal(&(*other)[i]) {
 			return false
 		}
 	}
@@ -87,26 +87,35 @@ func (coll FeatureCollection) String() string {
 
 // featureCollection is a utility type used to unmarshal a geojson FeatureCollection.
 type featureCollection struct {
-	Type     string    `json:"type"`
-	Features []Feature `json:"features"`
+	Type     string     `json:"type"`
+	Features []*feature `json:"features"`
+	BBox     []float64  `json:"bbox"`
+}
+
+func (fc *featureCollection) ToFeatureCollection() (*FeatureCollection, error) {
+	coll := make([]Feature, len(fc.Features))
+	for i, feat := range fc.Features {
+		f, err := feat.ToFeature()
+		if err != nil {
+			return nil, err
+		}
+		coll[i] = *f
+	}
+	featcoll := FeatureCollection(coll)
+	return &featcoll, nil
 }
 
 // UnmarshalJSON unmarshals the feature collection from geojson.
 func (coll *FeatureCollection) UnmarshalJSON(data []byte) error {
-	fc := featureCollection{}
-
-	// Never fails because data is always valid JSON.
-	_ = json.Unmarshal(data, &fc)
-
-	// Check the type.
-	if expected, got := FeatureCollectionType, fc.Type; expected != got {
-		return fmt.Errorf("expected %s type, got %s", expected, got)
+	fc, err := unmarshalFeatureCollection(data)
+	if err != nil {
+		return err
 	}
-
-	// Clear the collection and copy the unmarshalled features.
-	*coll = make([]Feature, len(fc.Features))
-	copy(*coll, fc.Features)
-
+	featcoll, err := fc.ToFeatureCollection()
+	if err != nil {
+		return err
+	}
+	*coll = *featcoll
 	return nil
 }
 
@@ -114,4 +123,32 @@ func (coll *FeatureCollection) UnmarshalJSON(data []byte) error {
 // Note that this returns a GEOMETRYCOLLECTION.
 func (coll FeatureCollection) Value() (driver.Value, error) {
 	return coll.String(), nil
+}
+
+func unmarshalFeatureCollection(data []byte) (*featureCollection, error) {
+	fc := &featureCollection{}
+
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, fc)
+
+	// Check the type.
+	if expected, got := FeatureCollectionType, fc.Type; expected != got {
+		return nil, fmt.Errorf("expected %s type, got %s", expected, got)
+	}
+	return fc, nil
+}
+
+func unmarshalFeatureCollectionBBox(data []byte) (Geometry, error) {
+	fc, err := unmarshalFeatureCollection(data)
+	if err != nil {
+		return nil, err
+	}
+	coll, err := fc.ToFeatureCollection()
+	if err != nil {
+		return nil, err
+	}
+	if len(fc.BBox) > 0 {
+		return WithBBox(fc.BBox, coll), nil
+	}
+	return coll, nil
 }

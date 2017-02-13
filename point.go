@@ -15,10 +15,10 @@ const (
 )
 
 // Point defines a point.
-type Point [2]float64
+type Point [3]float64
 
-// Compare compares one point to another.
-func (point Point) Compare(g Geometry) bool {
+// Equal compares one point to another.
+func (point Point) Equal(g Geometry) bool {
 	pt, ok := g.(*Point)
 	if !ok {
 		return false
@@ -32,9 +32,9 @@ func (point Point) Compare(g Geometry) bool {
 	return true
 }
 
-// Contains is the exact same as Compare.
+// Contains is the exact same as Equal.
 func (point Point) Contains(other Point) bool {
-	return point.Compare(&other)
+	return point.Equal(&other)
 }
 
 // DistanceFrom computes the distance from one point to another.
@@ -111,7 +111,7 @@ func (point *Point) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("expected %s type, got %s", expected, got)
 	}
 
-	pt := [2]float64{}
+	pt := [3]float64{}
 	if err := json.Unmarshal(g.Coordinates, &pt); err != nil {
 		return err
 	}

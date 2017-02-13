@@ -2,9 +2,9 @@ package geo
 
 import "testing"
 
-func TestPolygonEqual(t *testing.T) {
+func TestMultiLineEqual(t *testing.T) {
 	cases{
-		G: &Polygon{
+		G: &MultiLine{
 			{
 				{1.2, 3.4},
 				{5.6, 7.8},
@@ -13,14 +13,14 @@ func TestPolygonEqual(t *testing.T) {
 			},
 		},
 		Different: []Geometry{
-			&Polygon{
+			&MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
 					{1.4, 9.3},
 				},
 			},
-			&Polygon{
+			&MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -29,14 +29,14 @@ func TestPolygonEqual(t *testing.T) {
 					{1.4, 9.3},
 				},
 			},
-			&Polygon{
+			&MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
 					{1.4, 9.3},
 				},
 			},
-			&Polygon{
+			&MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -44,7 +44,7 @@ func TestPolygonEqual(t *testing.T) {
 					{-1.4, 7.3},
 				},
 			},
-			&Polygon{
+			&MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -63,11 +63,11 @@ func TestPolygonEqual(t *testing.T) {
 	}.test(t)
 }
 
-func TestPolygonContains(t *testing.T) {
+func TestMultiLineContains(t *testing.T) {
 	// Contains (square)
 	cases{
 		// Square
-		G: &Polygon{
+		G: &MultiLine{
 			{
 				{0, 0},
 				{2, 0},
@@ -86,7 +86,7 @@ func TestPolygonContains(t *testing.T) {
 
 	// Contains (hexagon)
 	cases{
-		G: &Polygon{
+		G: &MultiLine{
 			{
 				{0, 1},
 				{1, 2},
@@ -104,7 +104,7 @@ func TestPolygonContains(t *testing.T) {
 
 	// Contains (quadrilateral)
 	cases{
-		G: &Polygon{
+		G: &MultiLine{
 			{
 				{-1, 10},
 				{10, 1},
@@ -121,7 +121,7 @@ func TestPolygonContains(t *testing.T) {
 
 	// Contains (horizontal ray intersects two vertices)
 	cases{
-		G: &Polygon{
+		G: &MultiLine{
 			{
 				{0, 0},
 				{0, 4},
@@ -142,10 +142,10 @@ func TestPolygonContains(t *testing.T) {
 	}.test(t)
 }
 
-func TestPolygonEmpty(t *testing.T) {
+func TestMultiLineEmpty(t *testing.T) {
 	var (
-		p        = Polygon{}
-		expected = "POLYGON EMPTY"
+		p        = MultiLine{}
+		expected = "MULTILINESTRING EMPTY"
 	)
 	value, err := p.Value()
 	if err != nil {
@@ -160,20 +160,20 @@ func TestPolygonEmpty(t *testing.T) {
 	}
 }
 
-func TestPolygonMarshal(t *testing.T) {
+func TestMultiLineMarshal(t *testing.T) {
 	// Pass
 	marshalTestcases{
 		{
-			Input: &Polygon{
+			Input: &MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
 				},
 			},
-			Expected: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8]]]}`,
+			Expected: `{"type":"MultiLineString","coordinates":[[[1.2,3.4],[5.6,7.8]]]}`,
 		},
 		{
-			Input: &Polygon{
+			Input: &MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -185,20 +185,20 @@ func TestPolygonMarshal(t *testing.T) {
 					{1, 0},
 				},
 			},
-			Expected: `{"type":"Polygon","coordinates":[[[1.2,3.4],[5.6,7.8],[2,6]],[[0,0],[0,1],[1,0]]]}`,
+			Expected: `{"type":"MultiLineString","coordinates":[[[1.2,3.4],[5.6,7.8],[2,6]],[[0,0],[0,1],[1,0]]]}`,
 		},
 	}.pass(t)
 }
 
-func TestPolygonScan(t *testing.T) {
+func TestMultiLineScan(t *testing.T) {
 	// Pass
 	for _, testcase := range []struct {
 		WKT      string
-		Expected Polygon
+		Expected MultiLine
 	}{
 		{
-			WKT: "POLYGON((1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4))",
-			Expected: Polygon{
+			WKT: "MULTILINESTRING((1.2 3.4, 5.6 7.8, 6.2 1.5, 1.2 3.4))",
+			Expected: MultiLine{
 				{
 					{1.2, 3.4},
 					{5.6, 7.8},
@@ -208,8 +208,8 @@ func TestPolygonScan(t *testing.T) {
 			},
 		},
 		{
-			WKT: `POLYGON((-113.14448537305 33.4192544895836,-113.140408415347 33.4192634445438,-113.140419144183 33.4209917345629,-113.144506830722 33.4210096441239,-113.14448537305 33.4192544895836))`,
-			Expected: Polygon{
+			WKT: `MULTILINESTRING((-113.14448537305 33.4192544895836,-113.140408415347 33.4192634445438,-113.140419144183 33.4209917345629,-113.144506830722 33.4210096441239,-113.14448537305 33.4192544895836))`,
+			Expected: MultiLine{
 				{
 					{-113.14448537305, 33.4192544895836},
 					{-113.140408415347, 33.4192634445438},
@@ -220,7 +220,7 @@ func TestPolygonScan(t *testing.T) {
 			},
 		},
 	} {
-		p := &Polygon{}
+		p := &MultiLine{}
 		if err := p.Scan(testcase.WKT); err != nil {
 			t.Fatal(err)
 		}
@@ -235,27 +235,27 @@ func TestPolygonScan(t *testing.T) {
 	}
 	// Fail
 	for _, testcase := range []interface{}{
-		"POLYGON((1.2, 3.4, 5.6, 7.8))",
-		[]byte("POLYGON((1.2, 3.4, 5.6, 7.8))"),
+		"MULTILINESTRING((1.2, 3.4, 5.6, 7.8))",
+		[]byte("MULTILINESTRING((1.2, 3.4, 5.6, 7.8))"),
 		7,
-		"POLYGON(1.2 3.4 5.6 7.8)",
-		"POLYGON((1.2 3.4 5.6 7.8)}",
+		"MULTILINESTRING(1.2 3.4 5.6 7.8)",
+		"MULTILINESTRING((1.2 3.4 5.6 7.8)}",
 		"PIKACHU",
 	} {
-		p := &Polygon{}
+		p := &MultiLine{}
 		if err := p.Scan(testcase); err == nil {
 			t.Fatalf("expected err, got nil for %s", testcase.(string))
 		}
 	}
 }
 
-func TestPolygonString(t *testing.T) {
+func TestMultiLineString(t *testing.T) {
 	for _, c := range []struct {
-		Input    Polygon
+		Input    MultiLine
 		Expected string
 	}{
 		{
-			Input: Polygon{
+			Input: MultiLine{
 				{
 					{-4, -4},
 					{-4, 4},
@@ -268,7 +268,7 @@ func TestPolygonString(t *testing.T) {
 					{0, 1},
 				},
 			},
-			Expected: `POLYGON((-4 -4, -4 4, 4 4, 4 -4),(0 0, 1 0, 0 1))`,
+			Expected: `MULTILINESTRING((-4 -4, -4 4, 4 4, 4 -4),(0 0, 1 0, 0 1))`,
 		},
 	} {
 		if expected, got := c.Expected, c.Input.String(); expected != got {
@@ -277,12 +277,12 @@ func TestPolygonString(t *testing.T) {
 	}
 }
 
-func TestPolygonUnmarshalJSON(t *testing.T) {
+func TestMultiLineUnmarshalJSON(t *testing.T) {
 	unmarshalTestcases{
 		{
-			Input:    []byte(`{"type":"Polygon","coordinates":[[[0,0],[0,1],[1,1],[1,0]]]}`),
-			Instance: &Polygon{},
-			Expected: &Polygon{
+			Input:    []byte(`{"type":"MultiLineString","coordinates":[[[0,0],[0,1],[1,1],[1,0]]]}`),
+			Instance: &MultiLine{},
+			Expected: &MultiLine{
 				{
 					{0, 0},
 					{0, 1},
@@ -296,18 +296,18 @@ func TestPolygonUnmarshalJSON(t *testing.T) {
 	unmarshalTestcases{
 		{
 			Input:    []byte(`{"type":"Porygon","coordinates":[[[0,0],[0,1],[1,1],[1,0]]]}`),
-			Instance: &Polygon{},
+			Instance: &MultiLine{},
 		},
 		{
-			Input:    []byte(`{"type":"Polygon","coordinates":"bjork"}`),
-			Instance: &Polygon{},
+			Input:    []byte(`{"type":"MultiLineString","coordinates":"bjork"}`),
+			Instance: &MultiLine{},
 		},
 	}.fail(t)
 }
 
-func TestPolygonValue(t *testing.T) {
+func TestMultiLineValue(t *testing.T) {
 	var (
-		p = Polygon{
+		p = MultiLine{
 			{
 				{1.2, 3.4},
 				{5.6, 7.8},
@@ -315,7 +315,7 @@ func TestPolygonValue(t *testing.T) {
 				{4.3, 2.1},
 			},
 		}
-		expected = `POLYGON((1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1))`
+		expected = `MULTILINESTRING((1.2 3.4, 5.6 7.8, 8.7 6.5, 4.3 2.1))`
 	)
 	value, err := p.Value()
 	if err != nil {

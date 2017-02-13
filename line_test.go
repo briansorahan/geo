@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestLineCompare(t *testing.T) {
+func TestLineEqual(t *testing.T) {
 	cases{
 		G: &Line{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.3}},
 		Same: []Geometry{
@@ -71,21 +71,20 @@ func TestLineScan(t *testing.T) {
 		if err := l.Scan(c.Input); err != nil {
 			t.Fatalf("could not scan %v: %s", c.Input, err)
 		}
-		if !l.Compare(c.Expected) {
+		if !l.Equal(c.Expected) {
 			t.Fatalf("expected %v, got %v", c.Expected, l)
 		}
 	}
 
 	// Fail
-	for _, c := range []interface{}{
-		4,        // wrong type
-		`LINE()`, // wrong prefix
-		[]byte(`LINESTRING((3 3, 2 2))`), // too many parentheses
-		`LINESTRING(0, 0, 1, 1)`,         // should be spaces in between coordinates
+	for i, c := range []interface{}{
+		4,                        // wrong type
+		`LINE()`,                 // wrong prefix
+		`LINESTRING(0, 0, 1, 1)`, // should be spaces in between coordinates
 	} {
 		l := &Line{}
 		if err := l.Scan(c); err == nil {
-			t.Fatalf("expected error, got nil for %v", c)
+			t.Fatalf("(case %d) expected error, got nil for %v", i, c)
 		}
 	}
 }

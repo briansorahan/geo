@@ -34,13 +34,13 @@ type Circle struct {
 	Radius      float64 `json:"radius"`
 }
 
-// Compare compares the circle to another geometry.
-func (c Circle) Compare(g Geometry) bool {
+// Equal compares the circle to another geometry.
+func (c Circle) Equal(g Geometry) bool {
 	c2, ok := g.(*Circle)
 	if !ok {
 		return false
 	}
-	if !c.Coordinates.Compare(&c2.Coordinates) {
+	if !c.Coordinates.Equal(&c2.Coordinates) {
 		return false
 	}
 	return c.Radius == c2.Radius
@@ -159,7 +159,7 @@ func (c *Circle) scan(s string) error {
 
 // String returns a string representation of the circle.
 func (c Circle) String() string {
-	return "CIRCULARSTRING" + pointsString([][2]float64{
+	return "CIRCULARSTRING" + pointsString([][3]float64{
 		{c.Coordinates[0] + c.Radius, c.Coordinates[1]},
 		{c.Coordinates[0], c.Coordinates[1] + c.Radius},
 		{c.Coordinates[0] - c.Radius, c.Coordinates[1]},
@@ -179,7 +179,7 @@ func (c *Circle) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("expected %s for type, got %s", expected, got)
 	}
 
-	coords := [2]float64{}
+	coords := [3]float64{}
 	if err := json.Unmarshal(g.Coordinates, &coords); err != nil {
 		return err
 	}

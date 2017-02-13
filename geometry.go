@@ -10,12 +10,16 @@ import (
 
 // Geometry types.
 const (
-	CircleType            = "Circle"
-	FeatureCollectionType = "FeatureCollection"
-	FeatureType           = "Feature"
-	LineType              = "LineString"
-	PointType             = "Point"
-	PolygonType           = "Polygon"
+	CircleType             = "Circle"
+	FeatureCollectionType  = "FeatureCollection"
+	FeatureType            = "Feature"
+	GeometryCollectionType = "GeometryCollection"
+	MultiLineType          = "MultiLineString"
+	LineType               = "LineString"
+	MultiPointType         = "MultiPoint"
+	PointType              = "Point"
+	PolygonType            = "Polygon"
+	MultiPolygonType       = "MultiPolygon"
 )
 
 // Geometry defines the interface of every geometry type.
@@ -25,7 +29,7 @@ type Geometry interface {
 	sql.Scanner
 	driver.Valuer
 
-	Compare(g Geometry) bool
+	Equal(g Geometry) bool
 	Contains(p Point) bool
 	String() string
 }
@@ -63,56 +67,59 @@ func ScanGeometry(s string) (Geometry, error) {
 	return nil, fmt.Errorf("unrecognized geometry: %s", s)
 }
 
-// UnmarshalGeometry unmarshals a geometry from geojson data.
-func UnmarshalGeometry(data []byte) (Geometry, error) {
-	g := &geometry{}
-	if err := json.Unmarshal(data, g); err != nil {
-		return nil, err
-	}
-	return g.unmarshalCoordinates()
-}
-
 // geometry is a utility type used to unmarshal geometries from JSON.
 type geometry struct {
 	Type        string          `json:"type"`
 	Coordinates json.RawMessage `json:"coordinates"`
 	Radius      float64         `json:"radius"` // For circles!
+	BBox        []float64       `json:"bbox"`
 }
 
 // Geometry returns a Geometry, or an error if Type is invalid.
-func (g geometry) unmarshalCoordinates() (Geometry, error) {
+func (g geometry) unmarshalCoordinates() (geom Geometry, err error) {
 	switch g.Type {
 	default:
 		return nil, fmt.Errorf("unrecognized geometry type: %s", g.Type)
 	case PointType:
-		pt := [2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &pt); err != nil {
-			return nil, err
-		}
+		pt := [3]float64{}
+		err = json.Unmarshal(g.Coordinates, &pt)
 		p := Point(pt)
-		return &p, nil
+		geom = &p
+	case MultiPointType:
+		mpt := [][3]float64{}
+		err = json.Unmarshal(g.Coordinates, &mpt)
+		mp := MultiPoint(mpt)
+		geom = &mp
 	case LineType:
-		ln := [][2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &ln); err != nil {
-			return nil, err
-		}
+		ln := [][3]float64{}
+		err = json.Unmarshal(g.Coordinates, &ln)
 		l := Line(ln)
-		return &l, nil
+		geom = &l
+	case MultiLineType:
+		mln := [][][3]float64{}
+		err = json.Unmarshal(g.Coordinates, &mln)
+		ml := MultiLine(mln)
+		geom = &ml
 	case PolygonType:
-		poly := [][][2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &poly); err != nil {
-			return nil, err
-		}
+		poly := [][][3]float64{}
+		err = json.Unmarshal(g.Coordinates, &poly)
 		p := Polygon(poly)
-		return &p, nil
+		geom = &p
+	case MultiPolygonType:
+		mpoly := [][][][3]float64{}
+		err = json.Unmarshal(g.Coordinates, &mpoly)
+		mp := MultiPolygon(mpoly)
+		geom = &mp
 	case CircleType:
-		center := [2]float64{}
-		if err := json.Unmarshal(g.Coordinates, &center); err != nil {
-			return nil, err
-		}
-		return &Circle{
+		center := [3]float64{}
+		err = json.Unmarshal(g.Coordinates, &center)
+		geom = &Circle{
 			Coordinates: center,
 			Radius:      g.Radius,
-		}, nil
+		}
 	}
+	if len(g.BBox) > 0 {
+		return WithBBox(g.BBox, geom), err
+	}
+	return geom, err
 }
