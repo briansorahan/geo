@@ -2,23 +2,13 @@ package geo
 
 import "encoding/json"
 
-type blob struct {
-	*geometry
-
-	Features   []feature  `json:"features"`
-	Geometries []geometry `json:"geometries"`
-}
-
 // UnmarshalJSON unmarshals any GeoJSON type from a JSON blob.
 func UnmarshalJSON(data []byte) (Geometry, error) {
-	var (
-		geom = &geometry{}
-		b    = blob{geometry: geom}
-	)
-	if err := json.Unmarshal(data, &b); err != nil {
+	geom := &geometry{}
+	if err := json.Unmarshal(data, geom); err != nil {
 		return nil, err
 	}
-	switch b.Type {
+	switch geom.Type {
 	default:
 		return geom.unmarshalCoordinates()
 	case FeatureType:
