@@ -76,6 +76,25 @@ type feature struct {
 	BBox       []float64       `json:"bbox"`
 }
 
+// ToFeature converts the private feature type to the public one.
+func (f *feature) ToFeature() (*Feature, error) {
+	g := geometry{}
+
+	if err := json.Unmarshal(f.Geometry, &g); err != nil {
+		return nil, err
+	}
+
+	// Unmarshal the coordinates into one of our Geometry types.
+	geom, err := g.unmarshalCoordinates()
+	if err != nil {
+		return nil, err
+	}
+	feat := &Feature{}
+	feat.Geometry = geom
+	feat.Properties = f.Properties
+	return feat, nil
+}
+
 // UnmarshalJSON unmarshals a feature from JSON.
 func (f *Feature) UnmarshalJSON(data []byte) error {
 	ff, _, err := unmarshalFeature(data)

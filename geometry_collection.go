@@ -89,30 +89,33 @@ func (gc GeometryCollection) String() string {
 type geometryCollection struct {
 	Type       string      `json:"type"`
 	Geometries []*geometry `json:"geometries"`
+	BBox       []float64   `json:"bbox"`
+}
+
+func (coll geometryCollection) ToGeometryCollection() (*GeometryCollection, error) {
+	geometries := make([]Geometry, len(coll.Geometries))
+	for i, g := range coll.Geometries {
+		gg, err := g.unmarshalCoordinates()
+		if err != nil {
+			return nil, err
+		}
+		geometries[i] = gg
+	}
+	gc := GeometryCollection(geometries)
+	return &gc, nil
 }
 
 // UnmarshalJSON unmarshals the geometry collection from geojson.
 func (gc *GeometryCollection) UnmarshalJSON(data []byte) error {
-	coll := geometryCollection{}
-
-	// Never fails because data is always valid JSON.
-	_ = json.Unmarshal(data, &coll)
-
-	// Check the type.
-	if expected, got := GeometryCollectionType, coll.Type; expected != got {
-		return fmt.Errorf("expected %s type, got %s", expected, got)
+	coll, err := unmarshalGeometryCollection(data)
+	if err != nil {
+		return err
 	}
-
-	// Clear the collection and copy the unmarshalled geometries.
-	*gc = make([]Geometry, len(coll.Geometries))
-	for i, g := range coll.Geometries {
-		gg, err := g.unmarshalCoordinates()
-		if err != nil {
-			return err
-		}
-		(*gc)[i] = gg
+	geometries, err := coll.ToGeometryCollection()
+	if err != nil {
+		return err
 	}
-
+	*gc = *geometries
 	return nil
 }
 
@@ -120,4 +123,32 @@ func (gc *GeometryCollection) UnmarshalJSON(data []byte) error {
 // Note that this returns a GEOMETRYCOLLECTION.
 func (gc GeometryCollection) Value() (driver.Value, error) {
 	return gc.String(), nil
+}
+
+func unmarshalGeometryCollection(data []byte) (*geometryCollection, error) {
+	coll := &geometryCollection{}
+
+	// Never fails because data is always valid JSON.
+	_ = json.Unmarshal(data, coll)
+
+	// Check the type.
+	if expected, got := GeometryCollectionType, coll.Type; expected != got {
+		return nil, fmt.Errorf("expected %s type, got %s", expected, got)
+	}
+	return coll, nil
+}
+
+func unmarshalGeometryCollectionBBox(data []byte) (Geometry, error) {
+	coll, err := unmarshalGeometryCollection(data)
+	if err != nil {
+		return nil, err
+	}
+	geometries, err := coll.ToGeometryCollection()
+	if err != nil {
+		return nil, err
+	}
+	if len(coll.BBox) > 0 {
+		return WithBBox(coll.BBox, geometries), nil
+	}
+	return geometries, nil
 }

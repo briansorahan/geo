@@ -25,16 +25,8 @@ func UnmarshalJSON(data []byte) (Geometry, error) {
 	case FeatureType:
 		return unmarshalFeatureBBox(data)
 	case FeatureCollectionType:
-		var (
-			fc  = &FeatureCollection{}
-			err = fc.UnmarshalJSON(data)
-		)
-		return fc, err
+		return unmarshalFeatureCollectionBBox(data)
 	case GeometryCollectionType:
-		var (
-			gc  = &GeometryCollection{}
-			err = gc.UnmarshalJSON(data)
-		)
-		return gc, err
+		return unmarshalGeometryCollectionBBox(data)
 	}
 }

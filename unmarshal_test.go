@@ -6,6 +6,12 @@ func TestUnmarshalFail(t *testing.T) {
 	for i, data := range [][]byte{
 		// Invalid JSON
 		[]byte(`($*&%*)(`),
+
+		// Invalid feature
+		[]byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":{"foo":"bar"}}}`),
+
+		// Invalid feature collection
+		[]byte(`{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":{"foo":"bar"}}}]}`),
 	} {
 		if _, err := UnmarshalJSON(data); err == nil {
 			t.Fatalf("(case %d) expected error, got nil", i)

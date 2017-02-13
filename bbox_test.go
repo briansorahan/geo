@@ -74,13 +74,27 @@ func TestBBoxUnmarshal(t *testing.T) {
 		Input    []byte
 		Expected Geometry
 	}{
+		// Geometry
 		{
 			Input:    []byte(`{"type":"Point","coordinates":[1,2],"bbox":[1,2]}`),
 			Expected: WithBBox([]float64{1, 2}, &Point{1, 2}),
 		},
+		// Feature
 		{
 			Input:    []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]},"bbox":[1,2]}`),
 			Expected: WithBBox([]float64{1, 2}, &Feature{Geometry: &Point{1, 2}}),
+		},
+		// FeatureCollection
+		{
+			Input: []byte(`{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]}}],"bbox":[1,2]}`),
+			Expected: WithBBox([]float64{1, 2}, &FeatureCollection{
+				Feature{Geometry: &Point{1, 2}},
+			}),
+		},
+		// GeometryCollection
+		{
+			Input:    []byte(`{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[1,2]}],"bbox":[1,2]}`),
+			Expected: WithBBox([]float64{1, 2}, &GeometryCollection{&Point{1, 2}}),
 		},
 	} {
 		geom, err := UnmarshalJSON(testcase.Input)
