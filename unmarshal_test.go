@@ -33,7 +33,7 @@ func TestUnmarshalFeature(t *testing.T) {
 		if err != nil {
 			t.Fatalf("(case %d) %s", i, err)
 		}
-		if expected, got := testcase.Expected, geom; !expected.Compare(got) {
+		if expected, got := testcase.Expected, geom; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
 		}
 	}
@@ -55,7 +55,7 @@ func TestUnmarshalFeatureCollection(t *testing.T) {
 		if err != nil {
 			t.Fatalf("(case %d) %s", i, err)
 		}
-		if expected, got := testcase.Expected, geom; !expected.Compare(got) {
+		if expected, got := testcase.Expected, geom; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
 		}
 	}
@@ -77,7 +77,7 @@ func TestUnmarshalGeometryCollection(t *testing.T) {
 		if err != nil {
 			t.Fatalf("(case %d) %s", i, err)
 		}
-		if expected, got := testcase.Expected, geom; !expected.Compare(got) {
+		if expected, got := testcase.Expected, geom; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
 		}
 	}

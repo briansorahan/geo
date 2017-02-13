@@ -2,7 +2,7 @@ package geo
 
 import "testing"
 
-func TestPointCompare(t *testing.T) {
+func TestPointEqual(t *testing.T) {
 	// Different
 	cases{
 		G: &Point{1.2, 3.4},

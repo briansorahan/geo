@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-// pointsCompare compares two slices of points.
-func pointsCompare(p1, p2 [][3]float64) bool {
+// pointsEqual compares two slices of points.
+func pointsEqual(p1, p2 [][3]float64) bool {
 	if len(p1) != len(p2) {
 		return false
 	}

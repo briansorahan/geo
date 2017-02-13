@@ -2,7 +2,7 @@ package geo
 
 import "testing"
 
-func TestPolygonCompare(t *testing.T) {
+func TestPolygonEqual(t *testing.T) {
 	cases{
 		G: &Polygon{
 			{

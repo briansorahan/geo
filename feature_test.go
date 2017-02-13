@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestFeatureCompare(t *testing.T) {
+func TestFeatureEqual(t *testing.T) {
 	// Point
 	cases{
 		G: &Feature{
@@ -230,7 +230,7 @@ func TestFeatureUnmarshal(t *testing.T) {
 		if err := json.Unmarshal(testcase.Input, testcase.Instance); err != nil {
 			t.Fatalf("fail case %d: %s", i, err)
 		}
-		if expected, got := testcase.Expected.Geometry, testcase.Instance.Geometry; !expected.Compare(got) {
+		if expected, got := testcase.Expected.Geometry, testcase.Instance.Geometry; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %v, got %v", i, expected, got)
 		}
 	}

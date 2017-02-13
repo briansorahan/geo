@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestBBoxCompare(t *testing.T) {
+func TestBBoxEqual(t *testing.T) {
 	for i, testcase := range []struct {
 		Input     Geometry
 		Same      []Geometry
@@ -25,12 +25,12 @@ func TestBBoxCompare(t *testing.T) {
 		},
 	} {
 		for _, same := range testcase.Same {
-			if !testcase.Input.Compare(same) {
+			if !testcase.Input.Equal(same) {
 				t.Fatalf("(case %d) expected %#v to equal %#v", i, same, testcase.Input)
 			}
 		}
 		for _, other := range testcase.Different {
-			if testcase.Input.Compare(other) {
+			if testcase.Input.Equal(other) {
 				t.Fatalf("(case %d) expected %#v to not equal %#v", i, other, testcase.Input)
 			}
 		}
@@ -101,7 +101,7 @@ func TestBBoxUnmarshal(t *testing.T) {
 		if err != nil {
 			t.Fatalf("(case %d) %s", i, err)
 		}
-		if expected, got := testcase.Expected, geom; !expected.Compare(got) {
+		if expected, got := testcase.Expected, geom; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %#v to equal %#v", i, got, expected)
 		}
 	}

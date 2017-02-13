@@ -15,13 +15,13 @@ const (
 // Line is a line.
 type Line [][3]float64
 
-// Compare compares one line to another.
-func (line Line) Compare(g Geometry) bool {
+// Equal compares one line to another.
+func (line Line) Equal(g Geometry) bool {
 	ls, ok := g.(*Line)
 	if !ok {
 		return false
 	}
-	return pointsCompare(line, *ls)
+	return pointsEqual(line, *ls)
 }
 
 // Contains determines if the line contains a point.
@@ -38,7 +38,7 @@ func segmentContains(s1, s2, p [3]float64) bool {
 	if (p[1] > s1[1] && p[1] > s2[1]) || (p[1] < s1[1] && p[1] < s2[1]) {
 		return false
 	}
-	// Compare the slope of the segment between s1 and p
+	// Equal the slope of the segment between s1 and p
 	// to the slope of the segment between s1 and s2.
 	var (
 		segmentSlope = (s2[1] - s1[1]) / (s2[0] - s1[0])

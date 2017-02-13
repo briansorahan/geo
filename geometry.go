@@ -29,7 +29,7 @@ type Geometry interface {
 	sql.Scanner
 	driver.Valuer
 
-	Compare(g Geometry) bool
+	Equal(g Geometry) bool
 	Contains(p Point) bool
 	String() string
 }

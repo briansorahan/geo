@@ -3,7 +3,7 @@ package geo
 import "testing"
 
 func TestGeometryCollection(t *testing.T) {
-	// Compare
+	// Equal
 	cases{
 		G: &GeometryCollection{
 			&Point{1, 1},

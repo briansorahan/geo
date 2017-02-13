@@ -2,7 +2,7 @@ package geo
 
 import "testing"
 
-func TestMultiPolygonCompare(t *testing.T) {
+func TestMultiPolygonEqual(t *testing.T) {
 	cases{
 		G: &MultiPolygon{
 			{
@@ -281,7 +281,7 @@ func TestMultiPolygonScan(t *testing.T) {
 		if err := p.Scan(testcase.WKT); err != nil {
 			t.Fatalf("(case %d) %s", i, err)
 		}
-		if expected, got := testcase.Expected, p; !got.Compare(expected) {
+		if expected, got := testcase.Expected, p; !got.Equal(expected) {
 			t.Fatalf("(case %d) expected %f, got %f", i, expected, got)
 		}
 	}

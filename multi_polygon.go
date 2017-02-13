@@ -22,8 +22,8 @@ var (
 // MultiPolygon is a GeoJSON MultiPolygon.
 type MultiPolygon [][][][3]float64
 
-// Compare compares one polygon to another.
-func (multiPolygon MultiPolygon) Compare(g Geometry) bool {
+// Equal compares one polygon to another.
+func (multiPolygon MultiPolygon) Equal(g Geometry) bool {
 	p, ok := g.(*MultiPolygon)
 	if !ok {
 		return false
@@ -37,7 +37,7 @@ func (multiPolygon MultiPolygon) Compare(g Geometry) bool {
 			if len(p2) != len(p3) {
 				return false
 			}
-			if !pointsCompare(p2, p3) {
+			if !pointsEqual(p2, p3) {
 				return false
 			}
 		}

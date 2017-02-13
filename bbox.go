@@ -20,8 +20,8 @@ type boundingBox struct {
 	Box []float64 `json:"bbox"`
 }
 
-// Compare compares two geometries that have bounding boxes.
-func (bbox *boundingBox) Compare(g Geometry) bool {
+// Equal compares two geometries that have bounding boxes.
+func (bbox *boundingBox) Equal(g Geometry) bool {
 	other, ok := g.(*boundingBox)
 	if !ok {
 		return false
@@ -29,7 +29,7 @@ func (bbox *boundingBox) Compare(g Geometry) bool {
 	if !boxEqual(bbox.Box, other.Box) {
 		return false
 	}
-	return bbox.Geometry.Compare(other.Geometry)
+	return bbox.Geometry.Equal(other.Geometry)
 }
 
 // MarshalJSON marshals a geometry with a bounding box.

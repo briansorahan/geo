@@ -14,8 +14,8 @@ const (
 // FeatureCollection represents a feature collection.
 type FeatureCollection []Feature
 
-// Compare compares one feature collection to another.
-func (coll FeatureCollection) Compare(g Geometry) bool {
+// Equal compares one feature collection to another.
+func (coll FeatureCollection) Equal(g Geometry) bool {
 	other, ok := g.(*FeatureCollection)
 	if !ok {
 		return false
@@ -24,7 +24,7 @@ func (coll FeatureCollection) Compare(g Geometry) bool {
 		return false
 	}
 	for i, feat := range coll {
-		if !feat.Compare(&(*other)[i]) {
+		if !feat.Equal(&(*other)[i]) {
 			return false
 		}
 	}

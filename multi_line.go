@@ -20,8 +20,8 @@ var (
 // MultiLine is an array of Line's.
 type MultiLine [][][3]float64
 
-// Compare compares one MultiLine to another.
-func (ml MultiLine) Compare(g Geometry) bool {
+// Equal compares one MultiLine to another.
+func (ml MultiLine) Equal(g Geometry) bool {
 	p, ok := g.(*MultiLine)
 	if !ok {
 		return false
@@ -34,7 +34,7 @@ func (ml MultiLine) Compare(g Geometry) bool {
 		if len(p1) != len(p2) {
 			return false
 		}
-		if !pointsCompare(p1, p2) {
+		if !pointsEqual(p1, p2) {
 			return false
 		}
 	}

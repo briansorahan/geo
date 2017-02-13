@@ -17,8 +17,8 @@ const (
 // Point defines a point.
 type Point [3]float64
 
-// Compare compares one point to another.
-func (point Point) Compare(g Geometry) bool {
+// Equal compares one point to another.
+func (point Point) Equal(g Geometry) bool {
 	pt, ok := g.(*Point)
 	if !ok {
 		return false
@@ -32,9 +32,9 @@ func (point Point) Compare(g Geometry) bool {
 	return true
 }
 
-// Contains is the exact same as Compare.
+// Contains is the exact same as Equal.
 func (point Point) Contains(other Point) bool {
-	return point.Compare(&other)
+	return point.Equal(&other)
 }
 
 // DistanceFrom computes the distance from one point to another.

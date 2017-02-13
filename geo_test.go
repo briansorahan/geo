@@ -10,7 +10,7 @@ import (
 type cases struct {
 	G Geometry
 
-	// Compare tests.
+	// Equal tests.
 	Same      []Geometry
 	Different []Geometry
 
@@ -22,12 +22,12 @@ type cases struct {
 // pass runs the test cases that should pass.
 func (c cases) test(t *testing.T) {
 	for i, same := range c.Same {
-		if ok := c.G.Compare(same); !ok {
+		if ok := c.G.Equal(same); !ok {
 			t.Fatalf("(case %d) expected %s and %s to be the same", i, c.G.String(), same.String())
 		}
 	}
 	for i, diff := range c.Different {
-		if ok := c.G.Compare(diff); ok {
+		if ok := c.G.Equal(diff); ok {
 			t.Fatalf("(case %d) expected %s to not equal %s", i, c.G.String(), diff.String())
 		}
 	}
@@ -100,7 +100,7 @@ func (tests unmarshalTestcases) pass(t *testing.T) {
 		if err := json.Unmarshal(c.Input, c.Instance); err != nil {
 			t.Fatal(err)
 		}
-		if !c.Instance.Compare(c.Expected) {
+		if !c.Instance.Equal(c.Expected) {
 			t.Fatalf("(unmarshal %T pass case %d) expected %s to equal %s", c.Instance, i, c.Instance.String(), c.Expected.String())
 		}
 	}
@@ -137,8 +137,8 @@ func (tests valueTestcases) pass(t *testing.T) {
 // badGeom is a type that always returns an error from MarshalJSON and UnmarshalJSON.
 type badGeom struct{}
 
-// Compare always returns false
-func (badgeom badGeom) Compare(g Geometry) bool {
+// Equal always returns false
+func (badgeom badGeom) Equal(g Geometry) bool {
 	return false
 }
 

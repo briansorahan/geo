@@ -20,8 +20,8 @@ var (
 // Polygon is a GeoJSON Polygon.
 type Polygon [][][3]float64
 
-// Compare compares one polygon to another.
-func (polygon Polygon) Compare(g Geometry) bool {
+// Equal compares one polygon to another.
+func (polygon Polygon) Equal(g Geometry) bool {
 	p, ok := g.(*Polygon)
 	if !ok {
 		return false
@@ -34,7 +34,7 @@ func (polygon Polygon) Compare(g Geometry) bool {
 		if len(p1) != len(p2) {
 			return false
 		}
-		if !pointsCompare(p1, p2) {
+		if !pointsEqual(p1, p2) {
 			return false
 		}
 	}

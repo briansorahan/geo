@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestLineCompare(t *testing.T) {
+func TestLineEqual(t *testing.T) {
 	cases{
 		G: &Line{{1.2, 3.4}, {5.6, 7.8}, {1.4, 9.3}, {-1.7, 7.3}},
 		Same: []Geometry{
@@ -71,7 +71,7 @@ func TestLineScan(t *testing.T) {
 		if err := l.Scan(c.Input); err != nil {
 			t.Fatalf("could not scan %v: %s", c.Input, err)
 		}
-		if !l.Compare(c.Expected) {
+		if !l.Equal(c.Expected) {
 			t.Fatalf("expected %v, got %v", c.Expected, l)
 		}
 	}

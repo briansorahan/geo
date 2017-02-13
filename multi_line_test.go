@@ -2,7 +2,7 @@ package geo
 
 import "testing"
 
-func TestMultiLineCompare(t *testing.T) {
+func TestMultiLineEqual(t *testing.T) {
 	cases{
 		G: &MultiLine{
 			{

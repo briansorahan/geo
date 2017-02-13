@@ -14,14 +14,14 @@ const (
 // GeometryCollection is a collection of geometries.
 type GeometryCollection []Geometry
 
-// Compare compares the GeometryCollection to a Geometry.
-func (gc GeometryCollection) Compare(g Geometry) bool {
+// Equal compares the GeometryCollection to a Geometry.
+func (gc GeometryCollection) Equal(g Geometry) bool {
 	other, ok := g.(*GeometryCollection)
 	if !ok || len(gc) != len(*other) {
 		return false
 	}
 	for i, g := range gc {
-		if !g.Compare((*other)[i]) {
+		if !g.Equal((*other)[i]) {
 			return false
 		}
 	}

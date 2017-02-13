@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestCircleCompare(t *testing.T) {
+func TestCircleEqual(t *testing.T) {
 	// Different
 	cases{
 		G: &Circle{Radius: 1, Coordinates: Point{0, 0}},
@@ -95,7 +95,7 @@ func TestCircleScan(t *testing.T) {
 		if err := c.Scan(testcase.WKT); err != nil {
 			t.Fatal(err)
 		}
-		if !c.Compare(testcase.Expected) {
+		if !c.Equal(testcase.Expected) {
 			t.Fatalf("expected %v, got %v", c, testcase.Expected)
 		}
 	}

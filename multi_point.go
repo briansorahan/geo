@@ -12,13 +12,13 @@ const (
 // MultiPoint is a collection of points.
 type MultiPoint [][3]float64
 
-// Compare compares one MultiPoint to another.
-func (mp MultiPoint) Compare(g Geometry) bool {
+// Equal compares one MultiPoint to another.
+func (mp MultiPoint) Equal(g Geometry) bool {
 	other, ok := g.(*MultiPoint)
 	if !ok {
 		return false
 	}
-	return pointsCompare(mp, *other)
+	return pointsEqual(mp, *other)
 }
 
 // Contains determines if the MultiPoint contains a point.

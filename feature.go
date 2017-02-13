@@ -17,14 +17,14 @@ type Feature struct {
 	Properties interface{} `json:"properties,omitempty"`
 }
 
-// Compare compares one feature to another.
+// Equal compares one feature to another.
 // Note that this method does not compare properties.
-func (f Feature) Compare(g Geometry) bool {
+func (f Feature) Equal(g Geometry) bool {
 	other, ok := g.(*Feature)
 	if !ok {
 		return false
 	}
-	return f.Geometry.Compare(other.Geometry)
+	return f.Geometry.Equal(other.Geometry)
 }
 
 // Contains determines if the feature's geometry contains the point.

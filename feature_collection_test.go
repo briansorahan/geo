@@ -3,7 +3,7 @@ package geo
 import "testing"
 
 func TestFeatureCollection(t *testing.T) {
-	// Compare
+	// Equal
 	cases{
 		G: &FeatureCollection{
 			Feature{
