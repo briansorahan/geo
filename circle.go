@@ -196,9 +196,9 @@ func (c Circle) Value() (driver.Value, error) {
 }
 
 // Transform transforms the geometry point by point.
-func (circle *Circle) Transform(t Transformer) {
+func (c *Circle) Transform(t Transformer) {
 }
 
 // Visit visits each point in the geometry.
-func (circle Circle) Visit(v Visitor) {
+func (c Circle) Visit(v Visitor) {
 }

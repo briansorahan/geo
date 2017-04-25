@@ -282,7 +282,7 @@ func TestMultiPolygonScan(t *testing.T) {
 			t.Fatalf("(case %d) %s", i, err)
 		}
 		if expected, got := testcase.Expected, p; !got.Equal(expected) {
-			t.Fatalf("(case %d) expected %f, got %f", i, expected, got)
+			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
 		}
 	}
 	// Fail
