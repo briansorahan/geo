@@ -88,7 +88,7 @@ func TestBBoxUnmarshal(t *testing.T) {
 		{
 			Input: []byte(`{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]}}],"bbox":[1,2]}`),
 			Expected: WithBBox([]float64{1, 2}, &FeatureCollection{
-				Feature{Geometry: &Point{1, 2}},
+				&Feature{Geometry: &Point{1, 2}},
 			}),
 		},
 		// GeometryCollection

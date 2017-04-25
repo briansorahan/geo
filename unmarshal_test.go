@@ -1,6 +1,9 @@
 package geo
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestUnmarshalFail(t *testing.T) {
 	for i, data := range [][]byte{
@@ -20,6 +23,7 @@ func TestUnmarshalFail(t *testing.T) {
 }
 
 func TestUnmarshalFeature(t *testing.T) {
+	// Pass
 	for i, testcase := range []struct {
 		Input    []byte
 		Expected Geometry
@@ -37,9 +41,28 @@ func TestUnmarshalFeature(t *testing.T) {
 			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
 		}
 	}
+
+	// Fail
+	for i, input := range [][]byte{
+		[]byte(`{"type":"Feature","geometry":{"type":"Point","}}`),
+	} {
+
+		if _, err := UnmarshalJSON(input); err == nil {
+			t.Fatalf("(case %d) expected error, got nil", i)
+		}
+	}
+
+	// Test the private feature type used for unmarshalling.
+	f := &feature{
+		Geometry: json.RawMessage(`{"type":"Point}`),
+	}
+	if _, err := f.ToFeature(); err == nil {
+		t.Fatal("expected error, got nil")
+	}
 }
 
 func TestUnmarshalFeatureCollection(t *testing.T) {
+	// Pass
 	for i, testcase := range []struct {
 		Input    []byte
 		Expected Geometry
@@ -57,6 +80,17 @@ func TestUnmarshalFeatureCollection(t *testing.T) {
 		}
 		if expected, got := testcase.Expected, geom; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
+		}
+	}
+
+	// Fail
+	for i, input := range [][]byte{
+		[]byte(`{"type":"FeatureCollection","features":3,"bbox":[]}`),
+		[]byte(``),
+	} {
+
+		if _, err := UnmarshalJSON(input); err == nil {
+			t.Fatalf("(case %d) expected error, got nil", i)
 		}
 	}
 }
@@ -79,6 +113,17 @@ func TestUnmarshalGeometryCollection(t *testing.T) {
 		}
 		if expected, got := testcase.Expected, geom; !expected.Equal(got) {
 			t.Fatalf("(case %d) expected %#v, got %#v", i, expected, got)
+		}
+	}
+
+	// Fail
+	for i, input := range [][]byte{
+		[]byte(`{"type":"GeometryCollection","geometries":3,"bbox":[]}`),
+		[]byte(`{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":42}],"bbox":[]}`),
+	} {
+
+		if _, err := UnmarshalJSON(input); err == nil {
+			t.Fatalf("(case %d) expected error, got nil", i)
 		}
 	}
 }

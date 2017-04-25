@@ -44,6 +44,45 @@ func TestTransform(t *testing.T) {
 			},
 			t: pointShifter(1),
 		},
+		{
+			in: &Feature{
+				Geometry: &Line{{0, 0}, {1, 1}},
+			},
+			out: &Feature{
+				Geometry: &Line{{1, 1}, {2, 2}},
+			},
+			t: pointShifter(1),
+		},
+		{
+			in: &FeatureCollection{
+				{
+					Geometry: &Line{{0, 0}, {1, 1}},
+				},
+				{
+					Geometry: &Polygon{{{0, 0}, {0, 1}}, {{0, 1}, {1, 1}}, {{1, 1}, {1, 0}}, {{1, 0}, {0, 0}}},
+				},
+			},
+			out: &FeatureCollection{
+				{
+					Geometry: &Line{{1, 1}, {2, 2}},
+				},
+				{
+					Geometry: &Polygon{{{1, 1}, {1, 2}}, {{1, 2}, {2, 2}}, {{2, 2}, {2, 1}}, {{2, 1}, {1, 1}}},
+				},
+			},
+			t: pointShifter(1),
+		},
+		{
+			in: &GeometryCollection{
+				&Line{{0, 0}, {1, 1}},
+				&Polygon{{{0, 0}, {0, 1}}, {{0, 1}, {1, 1}}, {{1, 1}, {1, 0}}, {{1, 0}, {0, 0}}},
+			},
+			out: &GeometryCollection{
+				&Line{{1, 1}, {2, 2}},
+				&Polygon{{{1, 1}, {1, 2}}, {{1, 2}, {2, 2}}, {{2, 2}, {2, 1}}, {{2, 1}, {1, 1}}},
+			},
+			t: pointShifter(1),
+		},
 	} {
 		testcase.in.Transform(testcase.t)
 		if !testcase.out.Equal(testcase.in) {
