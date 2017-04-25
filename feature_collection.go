@@ -127,10 +127,16 @@ func (coll FeatureCollection) Value() (driver.Value, error) {
 
 // Transform transforms the geometry point by point.
 func (coll *FeatureCollection) Transform(t Transformer) {
+	for _, feat := range *coll {
+		(&feat).Transform(t)
+	}
 }
 
 // Visit visits each point in the geometry.
 func (coll FeatureCollection) Visit(v Visitor) {
+	for _, feat := range coll {
+		feat.Visit(v)
+	}
 }
 
 func unmarshalFeatureCollection(data []byte) (*featureCollection, error) {

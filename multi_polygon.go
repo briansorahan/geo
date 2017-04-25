@@ -173,8 +173,28 @@ func (multiPolygon MultiPolygon) Value() (driver.Value, error) {
 
 // Transform transforms the geometry point by point.
 func (multiPolygon *MultiPolygon) Transform(t Transformer) {
+	nmp := make([][][][3]float64, len(*multiPolygon))
+	for i, poly := range *multiPolygon {
+		np := make([][][3]float64, len(poly))
+		for j, line := range poly {
+			nl := make([][3]float64, len(line))
+			for k, point := range line {
+				nl[k] = t.Transform(point)
+			}
+			np[j] = nl
+		}
+		nmp[i] = np
+	}
+	*multiPolygon = nmp
 }
 
 // Visit visits each point in the geometry.
 func (multiPolygon MultiPolygon) Visit(v Visitor) {
+	for _, poly := range multiPolygon {
+		for _, line := range poly {
+			for _, point := range line {
+				v.Visit(point)
+			}
+		}
+	}
 }

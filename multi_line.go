@@ -147,8 +147,22 @@ func (ml MultiLine) Value() (driver.Value, error) {
 
 // Transform transforms the geometry point by point.
 func (ml *MultiLine) Transform(t Transformer) {
+	np := make([][][3]float64, len(*ml))
+	for i, line := range *ml {
+		nl := make([][3]float64, len(line))
+		for j, point := range line {
+			nl[j] = t.Transform(point)
+		}
+		np[i] = nl
+	}
+	*ml = np
 }
 
 // Visit visits each point in the geometry.
 func (ml MultiLine) Visit(v Visitor) {
+	for _, line := range ml {
+		for _, point := range line {
+			v.Visit(point)
+		}
+	}
 }
