@@ -6,14 +6,14 @@ func TestFeatureCollection(t *testing.T) {
 	// Equal
 	cases{
 		G: &FeatureCollection{
-			Feature{
+			{
 				Geometry: &Point{1, 1},
 			},
 		},
 		Different: []Geometry{
 			&FeatureCollection{},
 			&FeatureCollection{
-				Feature{
+				{
 					Geometry: &Line{{0, 0}, {1, 1}},
 				},
 			},
@@ -24,7 +24,7 @@ func TestFeatureCollection(t *testing.T) {
 	// Contains
 	cases{
 		G: &FeatureCollection{
-			Feature{
+			{
 				Geometry: &Polygon{
 					{
 						{0, 0},
@@ -123,7 +123,7 @@ func TestFeatureCollectionUnmarshal(t *testing.T) {
 		{
 			Input: []byte(`{"type": "FeatureCollection", "features": [{"geometry": {"type": "Polygon", "coordinates": [[[-113.131642956287, 33.4246272997084], [-113.133949656039, 33.4246272997084], [-113.133960384876, 33.4210006893439], [-113.131696600467, 33.4210006893439], [-113.131642956287, 33.4246272997084]]]}, "type": "Feature", "properties": {"id": "3f166f14-e8f3-454b-b7aa-401c8ee81c8d"}}]}`),
 			Expected: &FeatureCollection{
-				Feature{
+				{
 					Geometry: &Polygon{
 						{
 							{-113.131642956287, 33.4246272997084},
@@ -149,6 +149,14 @@ func TestFeatureCollectionUnmarshal(t *testing.T) {
 			Input:    []byte(`{"type":"FeatureColleccion","features":[]}`),
 			Instance: &FeatureCollection{},
 		},
+		{
+			Input:    []byte(`{"type":"FeatureCollection","features":"foo"}`),
+			Instance: &FeatureCollection{},
+		},
+		{
+			Input:    []byte(`{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":12}}]}`),
+			Instance: &FeatureCollection{},
+		},
 	}.fail(t)
 }
 
@@ -157,10 +165,10 @@ func TestFeatureCollectionValue(t *testing.T) {
 	valueTestcases{
 		{
 			Input: &FeatureCollection{
-				Feature{
+				{
 					Geometry: &Point{0, 0},
 				},
-				Feature{
+				{
 					Geometry: &Line{{-1, 1}, {1, -1}},
 				},
 			},

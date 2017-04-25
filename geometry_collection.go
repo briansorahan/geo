@@ -125,12 +125,26 @@ func (gc GeometryCollection) Value() (driver.Value, error) {
 	return gc.String(), nil
 }
 
+// Transform transforms the geometry point by point.
+func (gc *GeometryCollection) Transform(t Transformer) {
+	for _, g := range *gc {
+		g.Transform(t)
+	}
+}
+
+// Visit visits each point in the geometry.
+func (gc GeometryCollection) Visit(v Visitor) {
+	for _, g := range gc {
+		g.Visit(v)
+	}
+}
+
 func unmarshalGeometryCollection(data []byte) (*geometryCollection, error) {
 	coll := &geometryCollection{}
 
-	// Never fails because data is always valid JSON.
-	_ = json.Unmarshal(data, coll)
-
+	if err := json.Unmarshal(data, coll); err != nil {
+		return nil, err
+	}
 	// Check the type.
 	if expected, got := GeometryCollectionType, coll.Type; expected != got {
 		return nil, fmt.Errorf("expected %s type, got %s", expected, got)

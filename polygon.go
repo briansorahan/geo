@@ -144,3 +144,25 @@ func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 func (polygon Polygon) Value() (driver.Value, error) {
 	return polygon.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (polygon *Polygon) Transform(t Transformer) {
+	np := make([][][3]float64, len(*polygon))
+	for i, line := range *polygon {
+		nl := make([][3]float64, len(line))
+		for j, point := range line {
+			nl[j] = t.Transform(point)
+		}
+		np[i] = nl
+	}
+	*polygon = np
+}
+
+// Visit visits each point in the geometry.
+func (polygon Polygon) Visit(v Visitor) {
+	for _, line := range polygon {
+		for _, point := range line {
+			v.Visit(point)
+		}
+	}
+}

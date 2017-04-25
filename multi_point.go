@@ -68,3 +68,19 @@ func (mp *MultiPoint) UnmarshalJSON(data []byte) error {
 func (mp MultiPoint) Value() (driver.Value, error) {
 	return mp.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (mp *MultiPoint) Transform(t Transformer) {
+	nl := make([][3]float64, len(*mp))
+	for i, point := range *mp {
+		nl[i] = [3]float64(t.Transform(point))
+	}
+	*mp = nl
+}
+
+// Visit visits each point in the geometry.
+func (mp MultiPoint) Visit(v Visitor) {
+	for _, point := range mp {
+		v.Visit(point)
+	}
+}

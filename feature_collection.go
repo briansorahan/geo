@@ -12,7 +12,7 @@ const (
 )
 
 // FeatureCollection represents a feature collection.
-type FeatureCollection []Feature
+type FeatureCollection []*Feature
 
 // Equal compares one feature collection to another.
 func (coll FeatureCollection) Equal(g Geometry) bool {
@@ -24,7 +24,7 @@ func (coll FeatureCollection) Equal(g Geometry) bool {
 		return false
 	}
 	for i, feat := range coll {
-		if !feat.Equal(&(*other)[i]) {
+		if !feat.Equal((*other)[i]) {
 			return false
 		}
 	}
@@ -93,13 +93,13 @@ type featureCollection struct {
 }
 
 func (fc *featureCollection) ToFeatureCollection() (*FeatureCollection, error) {
-	coll := make([]Feature, len(fc.Features))
+	coll := make([]*Feature, len(fc.Features))
 	for i, feat := range fc.Features {
 		f, err := feat.ToFeature()
 		if err != nil {
 			return nil, err
 		}
-		coll[i] = *f
+		coll[i] = f
 	}
 	featcoll := FeatureCollection(coll)
 	return &featcoll, nil
@@ -125,12 +125,26 @@ func (coll FeatureCollection) Value() (driver.Value, error) {
 	return coll.String(), nil
 }
 
+// Transform transforms the geometry point by point.
+func (coll *FeatureCollection) Transform(t Transformer) {
+	for _, feat := range *coll {
+		feat.Transform(t)
+	}
+}
+
+// Visit visits each point in the geometry.
+func (coll FeatureCollection) Visit(v Visitor) {
+	for _, feat := range coll {
+		feat.Visit(v)
+	}
+}
+
 func unmarshalFeatureCollection(data []byte) (*featureCollection, error) {
 	fc := &featureCollection{}
 
-	// Never fails because data is always valid JSON.
-	_ = json.Unmarshal(data, fc)
-
+	if err := json.Unmarshal(data, fc); err != nil {
+		return nil, err
+	}
 	// Check the type.
 	if expected, got := FeatureCollectionType, fc.Type; expected != got {
 		return nil, fmt.Errorf("expected %s type, got %s", expected, got)

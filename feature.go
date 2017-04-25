@@ -83,7 +83,6 @@ func (f *feature) ToFeature() (*Feature, error) {
 	if err := json.Unmarshal(f.Geometry, &g); err != nil {
 		return nil, err
 	}
-
 	// Unmarshal the coordinates into one of our Geometry types.
 	geom, err := g.unmarshalCoordinates()
 	if err != nil {
@@ -108,6 +107,16 @@ func (f *Feature) UnmarshalJSON(data []byte) error {
 // Value returns well known text for the feature.
 func (f Feature) Value() (driver.Value, error) {
 	return f.Geometry.Value()
+}
+
+// Transform transforms the geometry point by point.
+func (f *Feature) Transform(t Transformer) {
+	f.Geometry.Transform(t)
+}
+
+// Visit visits each point in the geometry.
+func (f Feature) Visit(v Visitor) {
+	f.Geometry.Visit(v)
 }
 
 func unmarshalFeature(data []byte) (*Feature, *feature, error) {

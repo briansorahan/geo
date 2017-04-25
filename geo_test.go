@@ -171,3 +171,11 @@ func (badgeom badGeom) UnmarshalJSON(data []byte) error {
 func (badgeom badGeom) Value() (driver.Value, error) {
 	return nil, errors.New("bad geom")
 }
+
+// Transform transforms the geometry point by point.
+func (badgeom badGeom) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (badgeom badGeom) Visit(v Visitor) {
+}
