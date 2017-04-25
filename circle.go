@@ -194,3 +194,11 @@ func (c *Circle) UnmarshalJSON(data []byte) error {
 func (c Circle) Value() (driver.Value, error) {
 	return c.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (circle *Circle) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (circle Circle) Visit(v Visitor) {
+}

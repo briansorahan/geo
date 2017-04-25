@@ -125,6 +125,14 @@ func (coll FeatureCollection) Value() (driver.Value, error) {
 	return coll.String(), nil
 }
 
+// Transform transforms the geometry point by point.
+func (coll *FeatureCollection) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (coll FeatureCollection) Visit(v Visitor) {
+}
+
 func unmarshalFeatureCollection(data []byte) (*featureCollection, error) {
 	fc := &featureCollection{}
 

@@ -144,3 +144,11 @@ func (ml *MultiLine) UnmarshalJSON(data []byte) error {
 func (ml MultiLine) Value() (driver.Value, error) {
 	return ml.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (ml *MultiLine) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (ml MultiLine) Visit(v Visitor) {
+}

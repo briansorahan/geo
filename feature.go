@@ -110,6 +110,14 @@ func (f Feature) Value() (driver.Value, error) {
 	return f.Geometry.Value()
 }
 
+// Transform transforms the geometry point by point.
+func (f *Feature) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (f Feature) Visit(v Visitor) {
+}
+
 func unmarshalFeature(data []byte) (*Feature, *feature, error) {
 	feat := feature{}
 

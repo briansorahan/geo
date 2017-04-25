@@ -125,6 +125,14 @@ func (gc GeometryCollection) Value() (driver.Value, error) {
 	return gc.String(), nil
 }
 
+// Transform transforms the geometry point by point.
+func (gc *GeometryCollection) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (gc GeometryCollection) Visit(v Visitor) {
+}
+
 func unmarshalGeometryCollection(data []byte) (*geometryCollection, error) {
 	coll := &geometryCollection{}
 

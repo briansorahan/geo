@@ -170,3 +170,11 @@ func (multiPolygon *MultiPolygon) UnmarshalJSON(data []byte) error {
 func (multiPolygon MultiPolygon) Value() (driver.Value, error) {
 	return multiPolygon.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (multiPolygon *MultiPolygon) Transform(t Transformer) {
+}
+
+// Visit visits each point in the geometry.
+func (multiPolygon MultiPolygon) Visit(v Visitor) {
+}

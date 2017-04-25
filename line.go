@@ -92,3 +92,19 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 func (line Line) Value() (driver.Value, error) {
 	return line.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (line *Line) Transform(t Transformer) {
+	nl := make([][3]float64, len(*line))
+	for i, point := range *line {
+		nl[i] = [3]float64(t.Transform(point))
+	}
+	*line = nl
+}
+
+// Visit visits each point in the geometry.
+func (line Line) Visit(v Visitor) {
+	for _, point := range line {
+		v.Visit(point)
+	}
+}

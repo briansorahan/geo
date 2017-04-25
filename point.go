@@ -123,3 +123,13 @@ func (point *Point) UnmarshalJSON(data []byte) error {
 func (point Point) Value() (driver.Value, error) {
 	return point.String(), nil
 }
+
+// Transform transforms the geometry point by point.
+func (point *Point) Transform(t Transformer) {
+	*point = t.Transform(*point)
+}
+
+// Visit visits each point in the geometry.
+func (point Point) Visit(v Visitor) {
+	v.Visit(point)
+}

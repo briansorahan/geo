@@ -32,6 +32,18 @@ type Geometry interface {
 	Equal(g Geometry) bool
 	Contains(p Point) bool
 	String() string
+	Transform(Transformer)
+	Visit(Visitor)
+}
+
+// Transformer transforms geometries point by point.
+type Transformer interface {
+	Transform(Point) Point
+}
+
+// Visitor visits each point in a geometry.
+type Visitor interface {
+	Visit(Point)
 }
 
 // ScanGeometry scans a geometry from well known text.
