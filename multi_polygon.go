@@ -188,8 +188,8 @@ func (multiPolygon *MultiPolygon) Transform(t Transformer) {
 	*multiPolygon = nmp
 }
 
-// Visit visits each point in the geometry.
-func (multiPolygon MultiPolygon) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (multiPolygon MultiPolygon) VisitCoordinates(v Visitor) {
 	for _, poly := range multiPolygon {
 		for _, line := range poly {
 			for _, point := range line {

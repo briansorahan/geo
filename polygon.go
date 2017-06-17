@@ -158,8 +158,8 @@ func (polygon *Polygon) Transform(t Transformer) {
 	*polygon = np
 }
 
-// Visit visits each point in the geometry.
-func (polygon Polygon) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (polygon Polygon) VisitCoordinates(v Visitor) {
 	for _, line := range polygon {
 		for _, point := range line {
 			v.Visit(point)

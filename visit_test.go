@@ -2,7 +2,7 @@ package geo
 
 import "testing"
 
-func TestVisit(t *testing.T) {
+func TestVisitCoordinates(t *testing.T) {
 	for i, testcase := range []struct {
 		g Geometry
 		q quadrants
@@ -60,7 +60,7 @@ func TestVisit(t *testing.T) {
 		},
 	} {
 		q := &quadrants{}
-		testcase.g.Visit(q)
+		testcase.g.VisitCoordinates(q)
 		if expected, got := testcase.q, q; !got.Equal(expected) {
 			t.Fatalf("(test case %d) expected %#v to equal %#v", i, expected, *got)
 		}

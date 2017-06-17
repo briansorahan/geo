@@ -132,10 +132,10 @@ func (coll *FeatureCollection) Transform(t Transformer) {
 	}
 }
 
-// Visit visits each point in the geometry.
-func (coll FeatureCollection) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (coll FeatureCollection) VisitCoordinates(v Visitor) {
 	for _, feat := range coll {
-		feat.Visit(v)
+		feat.VisitCoordinates(v)
 	}
 }
 

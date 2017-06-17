@@ -33,7 +33,7 @@ type Geometry interface {
 	Contains(p Point) bool
 	String() string
 	Transform(Transformer)
-	Visit(Visitor)
+	VisitCoordinates(Visitor)
 }
 
 // Transformer transforms geometries point by point.

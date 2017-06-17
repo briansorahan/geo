@@ -78,8 +78,8 @@ func (mp *MultiPoint) Transform(t Transformer) {
 	*mp = nl
 }
 
-// Visit visits each point in the geometry.
-func (mp MultiPoint) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (mp MultiPoint) VisitCoordinates(v Visitor) {
 	for _, point := range mp {
 		v.Visit(point)
 	}

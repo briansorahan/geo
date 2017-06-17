@@ -132,10 +132,10 @@ func (gc *GeometryCollection) Transform(t Transformer) {
 	}
 }
 
-// Visit visits each point in the geometry.
-func (gc GeometryCollection) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (gc GeometryCollection) VisitCoordinates(v Visitor) {
 	for _, g := range gc {
-		g.Visit(v)
+		g.VisitCoordinates(v)
 	}
 }
 

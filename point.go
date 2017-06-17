@@ -129,7 +129,7 @@ func (point *Point) Transform(t Transformer) {
 	*point = t.Transform(*point)
 }
 
-// Visit visits each point in the geometry.
-func (point Point) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (point Point) VisitCoordinates(v Visitor) {
 	v.Visit(point)
 }

@@ -158,8 +158,8 @@ func (ml *MultiLine) Transform(t Transformer) {
 	*ml = np
 }
 
-// Visit visits each point in the geometry.
-func (ml MultiLine) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (ml MultiLine) VisitCoordinates(v Visitor) {
 	for _, line := range ml {
 		for _, point := range line {
 			v.Visit(point)

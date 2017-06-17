@@ -114,9 +114,9 @@ func (f *Feature) Transform(t Transformer) {
 	f.Geometry.Transform(t)
 }
 
-// Visit visits each point in the geometry.
-func (f Feature) Visit(v Visitor) {
-	f.Geometry.Visit(v)
+// VisitCoordinates visits each point in the geometry.
+func (f Feature) VisitCoordinates(v Visitor) {
+	f.Geometry.VisitCoordinates(v)
 }
 
 func unmarshalFeature(data []byte) (*Feature, *feature, error) {

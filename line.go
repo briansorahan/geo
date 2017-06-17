@@ -102,8 +102,8 @@ func (line *Line) Transform(t Transformer) {
 	*line = nl
 }
 
-// Visit visits each point in the geometry.
-func (line Line) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (line Line) VisitCoordinates(v Visitor) {
 	for _, point := range line {
 		v.Visit(point)
 	}

@@ -195,10 +195,10 @@ func (c Circle) Value() (driver.Value, error) {
 	return c.String(), nil
 }
 
-// Transform transforms the geometry point by point.
+// Transform transforms the geometry point by point. TODO.
 func (c *Circle) Transform(t Transformer) {
 }
 
-// Visit visits each point in the geometry.
-func (c Circle) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry. TODO.
+func (c Circle) VisitCoordinates(v Visitor) {
 }

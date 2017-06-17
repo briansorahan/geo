@@ -176,6 +176,6 @@ func (badgeom badGeom) Value() (driver.Value, error) {
 func (badgeom badGeom) Transform(t Transformer) {
 }
 
-// Visit visits each point in the geometry.
-func (badgeom badGeom) Visit(v Visitor) {
+// VisitCoordinates visits each point in the geometry.
+func (badgeom badGeom) VisitCoordinates(v Visitor) {
 }
